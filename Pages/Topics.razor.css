@@ -1,15 +1,35 @@
-.category-title {
-    padding: 8px 16px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    margin-bottom: 15px;
+/* Topics page styling */
+.topics-grid {
+    background-color: #e9ecef;
+}
+
+.topics-grid tbody tr:hover {
+    background-color: #dee2e6;
 }
 
 .category-container {
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 20px;
+    margin-bottom: 3rem;
 }
 
-    .category-container:last-child {
-        border-bottom: none;
-    }
+.topics-card {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.topics-card-header {
+    background-color: #b3d9ff;
+    color: #333;
+}
+
+.topics-card-title {
+    margin-bottom: 0;
+}
+
+.topics-card-body {
+    padding: 0;
+}
+
+.topics-table {
+    margin-bottom: 0;
+}

@@ -8,28 +8,31 @@
 
 @foreach (var category in categories)
 {
-    <div class="category-container mb-5">
-        <h3 class="category-title">@category</h3>
-        
-        <div class="grid-container">
-            <QuickGrid Items="@GetTopicsByCategory(category)" Class="table table-striped">
-                <PropertyColumn Property="@(t => t.Title)" Title="Topic Title" Sortable="true" />
-                <PropertyColumn Property="@(t => t.Author)" Title="Author" Sortable="true" />
-                <PropertyColumn Property="@(t => t.CreatedDate)" Title="Created" Format="MM/dd/yyyy" Sortable="true" />
-                <TemplateColumn Title="Status">
-                    <span class="badge @(context.IsOpen ? "bg-success" : "bg-secondary")">
-                        @(context.IsOpen ? "Open" : "Closed")
-                    </span>
-                </TemplateColumn>
-                <TemplateColumn Title="Actions">
-                    <button class="btn btn-sm btn-primary me-1" @onclick="() => EditTopic(context.Id)">
-                        Edit
-                    </button>
-                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteTopic(context.Id)">
-                        Delete
-                    </button>
-                </TemplateColumn>
-            </QuickGrid>
+    <div class="category-container">
+        <div class="card topics-card">
+            <div class="card-header topics-card-header">
+                <h5 class="card-title topics-card-title">@category</h5>
+            </div>
+            <div class="card-body topics-card-body">
+                <QuickGrid Items="@GetTopicsByCategory(category)" Class="table table-hover topics-table topics-grid">
+                    <PropertyColumn Property="@(t => t.Title)" Title="Topics" Sortable="true" />
+                    <PropertyColumn Property="@(t => t.Author)" Title="Author" Sortable="true" />
+                    <PropertyColumn Property="@(t => t.CreatedDate)" Title="Created" Format="MM/dd/yyyy" Sortable="true" />
+                    <TemplateColumn Title="Status">
+                        <span class="badge @(context.IsOpen ? "bg-success" : "bg-secondary")">
+                            @(context.IsOpen ? "Open" : "Closed")
+                        </span>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Actions">
+                        <button class="btn btn-sm btn-primary me-1" @onclick="() => EditTopic(context.Id)">
+                            Edit
+                        </button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteTopic(context.Id)">
+                            Delete
+                        </button>
+                    </TemplateColumn>
+                </QuickGrid>
+            </div>
         </div>
     </div>
 }
