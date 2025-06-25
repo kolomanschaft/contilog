@@ -1,10 +1,8 @@
 /* Topics page styling */
 .topics-grid {
-    background-color: #e9ecef;
-}
-
-.topics-grid tbody tr:hover {
-    background-color: #dee2e6;
+    background-color: var(--bg-muted);
+    table-layout: fixed;
+    width: 100%;
 }
 
 .category-container {
@@ -18,8 +16,8 @@
 }
 
 .topics-card-header {
-    background-color: #b3d9ff;
-    color: #333;
+    background-color: var(--primary-light);
+    color: var(--text-primary);
 }
 
 .topics-card-title {
@@ -32,4 +30,14 @@
 
 .topics-table {
     margin-bottom: 0;
+}
+
+/* Inactive topic styling */
+.topics-grid tbody tr.inactive-topic {
+    opacity: 0.6;
+    background-color: var(--bg-secondary);
+}
+
+.topics-grid tbody tr.inactive-topic td {
+    color: var(--text-muted);
 }

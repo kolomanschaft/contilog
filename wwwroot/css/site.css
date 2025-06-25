@@ -1,5 +1,47 @@
 @import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
 
+/* Theme Colors - CSS Custom Properties */
+:root {
+    /* Primary Colors */
+    --primary-color: #1b6ec2;
+    --primary-light: #b3d9ff;
+    --primary-dark: #1861ac;
+    
+    /* Secondary Colors */
+    --secondary-color: #6c757d;
+    --secondary-light: #e9ecef;
+    --secondary-dark: #495057;
+    
+    /* Success/Error Colors */
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    
+    /* Neutral Colors */
+    --white: #ffffff;
+    --light-gray: #f8f9fa;
+    --medium-gray: #e9ecef;
+    --dark-gray: #6c757d;
+    --black: #000000;
+    
+    /* Background Colors */
+    --bg-primary: var(--primary-color);
+    --bg-secondary: var(--light-gray);
+    --bg-muted: var(--medium-gray);
+    
+    /* Text Colors */
+    --text-primary: #212529;
+    --text-secondary: var(--dark-gray);
+    --text-muted: #6c757d;
+    --text-white: var(--white);
+    
+    /* Border Colors */
+    --border-color: #dee2e6;
+    --border-light: #e9ecef;
+    --border-dark: #adb5bd;
+}
+
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
@@ -9,13 +51,13 @@ h1:focus {
 }
 
 a, .btn-link {
-    color: #0071c1;
+    color: var(--primary-color);
 }
 
 .btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
+    color: var(--text-white);
+    background-color: var(--primary-color);
+    border-color: var(--primary-dark);
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
