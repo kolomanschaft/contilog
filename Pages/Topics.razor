@@ -1,6 +1,75 @@
 @page "/topics"
+@using Contilog.Models
+@using System.Linq
 
 <PageTitle>Topics</PageTitle>
 
 <h1>Topics</h1>
+
+@foreach (var category in categories)
+{
+    <div class="category-container mb-5">
+        <h3 class="category-title">@category</h3>
+        
+        <div class="grid-container">
+            <QuickGrid Items="@GetTopicsByCategory(category)" Class="table table-striped">
+                <PropertyColumn Property="@(t => t.Title)" Title="Topic Title" Sortable="true" />
+                <PropertyColumn Property="@(t => t.Author)" Title="Author" Sortable="true" />
+                <PropertyColumn Property="@(t => t.CreatedDate)" Title="Created" Format="MM/dd/yyyy" Sortable="true" />
+                <TemplateColumn Title="Status">
+                    <span class="badge @(context.IsOpen ? "bg-success" : "bg-secondary")">
+                        @(context.IsOpen ? "Open" : "Closed")
+                    </span>
+                </TemplateColumn>
+                <TemplateColumn Title="Actions">
+                    <button class="btn btn-sm btn-primary me-1" @onclick="() => EditTopic(context.Id)">
+                        Edit
+                    </button>
+                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteTopic(context.Id)">
+                        Delete
+                    </button>
+                </TemplateColumn>
+            </QuickGrid>
+        </div>
+    </div>
+}
+
+@code {
+    private IQueryable<Topic> topics = new List<Topic>
+    {
+        new Topic { Id = 1, Title = "Getting Started with Blazor", Category = "Web Development", Author = "John Doe", CreatedDate = DateTime.Now.AddDays(-30), IsOpen = true },
+        new Topic { Id = 2, Title = "ASP.NET Core Best Practices", Category = "Backend", Author = "Jane Smith", CreatedDate = DateTime.Now.AddDays(-15), IsOpen = true },
+        new Topic { Id = 3, Title = "Entity Framework Tips", Category = "Database", Author = "Mike Johnson", CreatedDate = DateTime.Now.AddDays(-7), IsOpen = true },
+        new Topic { Id = 4, Title = "CSS Grid Layout", Category = "Frontend", Author = "Sarah Wilson", CreatedDate = DateTime.Now.AddDays(-45), IsOpen = false },
+        new Topic { Id = 5, Title = "JavaScript ES6 Features", Category = "Frontend", Author = "Alex Brown", CreatedDate = DateTime.Now.AddDays(-22), IsOpen = true },
+        new Topic { Id = 6, Title = "Docker for Developers", Category = "DevOps", Author = "Chris Davis", CreatedDate = DateTime.Now.AddDays(-3), IsOpen = true },
+        new Topic { Id = 7, Title = "Testing Strategies", Category = "Quality Assurance", Author = "Emma Miller", CreatedDate = DateTime.Now.AddDays(-60), IsOpen = false },
+        new Topic { Id = 8, Title = "Performance Optimization", Category = "Backend", Author = "David Lee", CreatedDate = DateTime.Now.AddDays(-12), IsOpen = true }
+    }.AsQueryable();
+
+    // Extract unique categories and sort them alphabetically
+    private List<string> categories => topics
+        .Select(t => t.Category)
+        .Distinct()
+        .OrderBy(c => c)
+        .ToList();
+
+    // Filter topics by category
+    private IQueryable<Topic> GetTopicsByCategory(string category)
+    {
+        return topics.Where(t => t.Category == category);
+    }
+
+    private void EditTopic(int topicId)
+    {
+        // TODO: Implement edit functionality
+        Console.WriteLine($"Editing topic with ID: {topicId}");
+    }
+
+    private void DeleteTopic(int topicId)
+    {
+        // TODO: Implement delete functionality
+        Console.WriteLine($"Deleting topic with ID: {topicId}");
+    }
+}
 

@@ -1,0 +1,15 @@
+.category-title {
+    padding: 8px 16px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.category-container {
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 20px;
+}
+
+    .category-container:last-child {
+        border-bottom: none;
+    }
