@@ -31,11 +31,20 @@
                         </span>
                     </TemplateColumn>
                     <TemplateColumn Title="Actions">
-                        <button class="btn btn-sm btn-primary me-1" @onclick="() => EditTopic(context.Id)" disabled="@(!context.IsActive)">
-                            Edit
-                        </button>
-                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteTopic(context.Id)">
-                            Delete
+                        @if (context.IsActive)
+                        {
+                            <button class="btn btn-sm btn-primary me-1" @onclick="() => EditTopic(context.Id)" title="Edit Topic">
+                                <span class="oi oi-pencil" aria-hidden="true"></span>
+                            </button>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-success me-1" @onclick="() => ReactivateTopic(context.Id)" title="Reactivate Topic">
+                                <span class="oi oi-power-standby" aria-hidden="true"></span>
+                            </button>
+                        }
+                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteTopic(context.Id)" title="Delete Topic">
+                            <span class="oi oi-trash" aria-hidden="true"></span>
                         </button>
                     </TemplateColumn>
                 </QuickGrid>
@@ -77,6 +86,20 @@
     {
         // TODO: Implement edit functionality
         Console.WriteLine($"Editing topic with ID: {topicId}");
+    }
+
+    private void ReactivateTopic(int topicId)
+    {
+        // Find and reactivate the topic
+        var topicList = topics.ToList();
+        var topic = topicList.FirstOrDefault(t => t.Id == topicId);
+        if (topic != null)
+        {
+            topic.IsActive = true;
+            // Update the topics collection
+            topics = topicList.AsQueryable();
+            Console.WriteLine($"Reactivated topic with ID: {topicId}");
+        }
     }
 
     private void DeleteTopic(int topicId)
