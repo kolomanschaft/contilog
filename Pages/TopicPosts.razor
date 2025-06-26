@@ -47,16 +47,9 @@ else
     <div class="posts-section">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h3>Posts (@posts.Count())</h3>
-            @if (topic.IsActive)
-            {
-                <button class="btn btn-primary" @onclick="AddNewPost">
-                    <span class="oi oi-plus" aria-hidden="true"></span>
-                    Add Post
-                </button>
-            }
         </div>
 
-        @if (!posts.Any())
+        @if (!posts.Any() && topic.IsActive)
         {
             <div class="alert alert-info">
                 <h5>No posts yet</h5>
@@ -70,15 +63,20 @@ else
                 {
                     <div class="card post-card mb-3">
                         <div class="card-body">
-                            <div class="post-content">
-                                <p class="post-text">@post.Text</p>
-                            </div>
-                            <div class="post-meta">
-                                <div class="d-flex justify-content-between align-items-center">
+                            <div class="post-header d-flex justify-content-between align-items-start">
+                                <div class="post-content">
+                                    <p class="post-text">@post.Text</p>
+                                </div>
+                                <div class="post-meta-top text-end text-muted">
+                                    <div class="post-edit-button mb-2">
+                                        <button class="btn btn-sm btn-outline-primary" @onclick="() => EditPost(post.Id)" title="Edit Post">
+                                            <span class="oi oi-pencil" aria-hidden="true"></span>
+                                        </button>
+                                    </div>
                                     <div class="post-author">
                                         <strong>@post.Author</strong>
                                     </div>
-                                    <div class="post-date text-muted">
+                                    <div class="post-date">
                                         @post.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
                                     </div>
                                 </div>
@@ -86,6 +84,16 @@ else
                         </div>
                     </div>
                 }
+            </div>
+        }
+
+        @if (topic.IsActive)
+        {
+            <div class="d-flex justify-content-center mt-4">
+                <button class="btn btn-primary" @onclick="AddNewPost">
+                    <span class="oi oi-plus" aria-hidden="true"></span>
+                    Add Post
+                </button>
             </div>
         }
     </div>
@@ -134,7 +142,9 @@ else
         if (topic != null)
         {
             topicTitle = topic.Title;
-            posts = samplePosts.Where(p => p.TopicId == TopicId);
+            posts = samplePosts
+                .Where(p => p.TopicId == TopicId)
+                .OrderBy(p => p.CreatedDate);
         }
     }
 
@@ -142,5 +152,11 @@ else
     {
         // TODO: Implement add new post functionality
         Console.WriteLine("Add new post clicked");
+    }
+
+    private void EditPost(int postId)
+    {
+        // TODO: Implement edit post functionality
+        Console.WriteLine($"Editing post with ID: {postId}");
     }
 }
