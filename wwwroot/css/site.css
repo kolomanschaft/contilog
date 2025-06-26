@@ -50,6 +50,10 @@
     --shadow-md: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.15);
     --shadow-lg: 0 0.5rem 1rem rgba(0, 0, 0, 0.25);
     --shadow-xl: 0 1rem 2rem rgba(0, 0, 0, 0.3);
+    
+    /* Layout Widths */
+    --content-max-width: 1200px;
+    --card-max-width: var(--content-max-width);
 }
 
 html, body {

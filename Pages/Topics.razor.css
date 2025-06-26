@@ -11,7 +11,7 @@
 
 .topics-card {
     box-shadow: var(--shadow-md);
-    max-width: 1200px;
+    max-width: var(--card-max-width);
     margin: 0 auto;
 }
 
