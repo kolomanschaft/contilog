@@ -36,6 +36,7 @@
     --text-muted: #6c757d;
     --text-white: var(--white);
     --text-nav-menu: var(--white);
+    --text-link: var(--text-primary);
     
     /* Border Colors */
     --border-color: #dee2e6;

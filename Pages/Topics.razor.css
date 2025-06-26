@@ -32,6 +32,18 @@
     margin-bottom: 0;
 }
 
+/* Topic link styling */
+.topic-link {
+    color: var(--text-link);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.topic-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
 /* Inactive topic styling */
 .topics-grid tbody tr.inactive-topic {
     opacity: 0.6;
