@@ -17,7 +17,7 @@
                 <QuickGrid Items="@GetTopicsByCategory(category)" Class="table topics-table topics-grid">
                     <TemplateColumn Title="Topics" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Title))">
                         <div class="@(context.IsActive ? "" : "text-muted")">
-                            <a href="#" @onclick="() => EditTopic(context.Id)" @onclick:preventDefault="true" class="topic-link">
+                            <a href="/topics/@context.Id" class="topic-link">
                                 @context.Title
                             </a>
                         </div>
@@ -28,9 +28,7 @@
                         </div>
                     </TemplateColumn>
                     <TemplateColumn Title="Status">
-                        <span class="badge @(context.IsActive ? "bg-success" : "bg-secondary")">
-                            @(context.IsActive ? "Active" : "Closed")
-                        </span>
+                        <StatusBadge IsActive="context.IsActive" />
                     </TemplateColumn>
                     <TemplateColumn Title="Actions">
                         @if (!context.IsActive)

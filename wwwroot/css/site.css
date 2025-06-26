@@ -29,6 +29,8 @@
     --bg-primary: var(--primary-color);
     --bg-secondary: var(--light-gray);
     --bg-muted: var(--medium-gray);
+    --bg-white: var(--white);
+    --bg-light: var(--light-gray);
     
     /* Text Colors */
     --text-primary: #212529;
