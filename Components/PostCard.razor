@@ -51,8 +51,16 @@
                         <strong>@Post.Author</strong>
                     </div>
                     <div class="post-date">
+                        <b>Created: </b>
                         @Post.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
                     </div>
+                    @if (!Post.ModifiedDate.Equals(Post.CreatedDate))
+                    {
+                        <div class="post-date">
+                            <b>Last modified: </b>
+                            @Post.ModifiedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
+                        </div>
+                    }
                 </div>
             </div>
         }

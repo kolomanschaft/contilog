@@ -33,7 +33,7 @@ else
                     <div class="col-md-4">
                         <strong>Category:</strong> @categoryName
                     </div>
-                </div>
+            </div>
                 <div class="row small mt-2">
                     <div class="col-md-4">
                         <strong>Status:</strong> 
@@ -149,14 +149,14 @@ else
         if (editingPostId.HasValue)
         {
             // Update the post in the repository
-            var success = await PostRepository.UpdatePostAsync(editedPost);
-            if (success)
+            var  updatedPost = await PostRepository.UpdatePostAsync(editedPost);
+            if (updatedPost != null)
             {
                 // Update the local list
                 var postIndex = posts.FindIndex(p => p.Id == editingPostId.Value);
                 if (postIndex >= 0)
                 {
-                    posts[postIndex] = editedPost;
+                    posts[postIndex] = updatedPost;
                 }
                 
                 // Exit edit mode

@@ -40,10 +40,16 @@ namespace Contilog.Repositories
             };
         }
 
-        public Task<IEnumerable<Post>> GetPostsByTopicIdAsync(int topicId)
+        public async Task<IEnumerable<Post>> GetPostsByTopicIdAsync(int topicId)
         {
             var posts = _posts.Where(p => p.TopicId == topicId).OrderByDescending(p => p.CreatedDate).AsEnumerable();
-            return Task.FromResult(posts);
+            return await Task.FromResult(posts);
+        }
+
+        public async Task<Post?> GetPostByIdAsync(int id)
+        {
+            var post = _posts.FirstOrDefault(p => p.Id == id);
+            return await Task.FromResult(post);
         }
 
         public Task<int> GetPostCountByTopicIdAsync(int topicId)
@@ -52,16 +58,17 @@ namespace Contilog.Repositories
             return Task.FromResult(count);
         }
 
-        public Task<bool> UpdatePostAsync(Post post)
+        public Task<Post?> UpdatePostAsync(Post post)
         {
             var existingPost = _posts.FirstOrDefault(p => p.Id == post.Id);
             if (existingPost != null)
             {
                 existingPost.Content = post.Content;
+                existingPost.ModifiedDate = DateTime.Now;
                 // Note: We don't update Author or CreatedDate for existing posts
-                return Task.FromResult(true);
+                return Task.FromResult<Post?>(existingPost);
             }
-            return Task.FromResult(false);
+            return Task.FromResult<Post?>(null);
         }
     }
 }
