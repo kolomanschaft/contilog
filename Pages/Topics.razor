@@ -4,6 +4,7 @@
 @using System.Linq
 @inject ITopicRepository TopicRepository
 @inject IPostRepository PostRepository
+@inject ICategoryRepository CategoryRepository
 @inject NavigationManager Navigation
 
 <PageTitle>Topics</PageTitle>
@@ -31,7 +32,7 @@ else
         <div class="category-container">
             <div class="card topics-card">
                 <div class="card-header topics-card-header">
-                    <h5 class="card-title topics-card-title">@category</h5>
+                    <h5 class="card-title topics-card-title">@category.Name</h5>
                 </div>
                 <div class="card-body topics-card-body">
                     <QuickGrid Items="@GetTopicsByCategory(category)" Class="table topics-table topics-grid">
@@ -50,7 +51,7 @@ else
                                 @GetPostCount(context.Id)
                             </div>
                         </TemplateColumn>
-                        <TemplateColumn Title="Actions">
+                        <TemplateColumn>
                             <div class="topics-action-cell">
                                 <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => ViewPosts(context.Id)" title="View Posts">
                                     <span class="oi oi-eye" aria-hidden="true"></span>
@@ -69,7 +70,8 @@ else
 
 @code {
     private bool archiveMode = false;
-    private List<Topic>? topics;
+    private List<Topic>? topics = new();
+    private List<Category>? categories = new();
     private Dictionary<int, int> postCounts = new();
 
     protected override async Task OnInitializedAsync()
@@ -79,10 +81,8 @@ else
 
     private async Task LoadTopicsAsync()
     {
-        var allTopics = await TopicRepository.GetAllTopicsAsync();
-        topics = allTopics.ToList();
-
-        // Load post counts for all topics
+        categories = (await CategoryRepository.GetAllCategoriesAsync()).ToList();
+        topics = (await TopicRepository.GetAllTopicsAsync()).ToList();
         postCounts.Clear();
         foreach (var topic in topics)
         {
@@ -93,21 +93,13 @@ else
         StateHasChanged();
     }
 
-    // Extract unique categories and sort them alphabetically
-    private List<string> categories => topics?
-        .Where(t => t.IsActive != archiveMode)
-        .Select(t => t.Category)
-        .Distinct()
-        .OrderBy(c => c)
-        .ToList() ?? new List<string>();
-
     // Filter topics by category
-    private IQueryable<Topic> GetTopicsByCategory(string category)
+    private IQueryable<Topic> GetTopicsByCategory(Category category)
     {
         if (topics == null) return new List<Topic>().AsQueryable();
 
         return topics
-            .Where(t => t.Category == category)
+            .Where(t => t.CategoryId == category.Id)
             .Where(t => t.IsActive != archiveMode)
             .OrderByDescending(t => t.IsActive)
             .ThenByDescending(t => t.CreatedDate)

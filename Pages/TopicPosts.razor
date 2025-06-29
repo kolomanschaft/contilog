@@ -3,6 +3,7 @@
 @using Contilog.Repositories
 @using System.Linq
 @inject ITopicRepository TopicRepository
+@inject ICategoryRepository CategoryRepository
 @inject IPostRepository PostRepository
 
 <PageTitle>@topicTitle</PageTitle>
@@ -30,7 +31,7 @@ else
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <strong>Category:</strong> @topic.Category
+                        <strong>Category:</strong> @categoryName
                     </div>
                     <div class="col-md-6">
                         <strong>Author:</strong> @topic.Author
@@ -108,6 +109,8 @@ else
 
     private Topic? topic;
     private string topicTitle = "Topic Details";
+    private Category? category;
+    private String categoryName = string.Empty;
     private List<Post> posts = new();
 
     protected override async Task OnInitializedAsync()
@@ -128,6 +131,15 @@ else
             topicTitle = topic.Title;
             var topicPosts = await PostRepository.GetPostsByTopicIdAsync(TopicId);
             posts = topicPosts.ToList();
+            category = await CategoryRepository.GetCategoryByIdAsync(topic.CategoryId);
+            if (category != null)
+            {
+                categoryName = category.Name;
+            }
+            else
+            {
+                categoryName = "Unknown Category";
+            }
         }
         else
         {

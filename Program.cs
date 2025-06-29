@@ -9,6 +9,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 // Register repositories
+builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
 builder.Services.AddSingleton<ITopicRepository, TopicRepository>();
 builder.Services.AddSingleton<IPostRepository, PostRepository>();
 
