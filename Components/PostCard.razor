@@ -12,11 +12,6 @@
                 <ValidationSummary />
                 
                 <div class="mb-3">
-                    <label for="post-title" class="form-label">Title</label>
-                    <InputText id="post-title" class="form-control" @bind-Value="EditModel.Title" />
-                </div>
-                
-                <div class="mb-3">
                     <label for="post-content" class="form-label">Content</label>
                     <InputTextArea id="post-content" class="form-control post-editor" rows="8" @bind-Value="EditModel.Content" />
                 </div>
@@ -44,7 +39,6 @@
             <!-- View Mode -->
             <div class="post-header d-flex justify-content-between align-items-start">
                 <div class="post-content">
-                    <h6 class="post-title">@Post.Title</h6>
                     <p class="post-text">@Post.Content</p>
                 </div>
                 <div class="post-meta-top text-end text-muted">
@@ -81,7 +75,6 @@
             EditModel = new Post
             {
                 Id = Post.Id,
-                Title = Post.Title,
                 Content = Post.Content,
                 Author = Post.Author,
                 TopicId = Post.TopicId,
