@@ -1,0 +1,107 @@
+@namespace Contilog.Components
+@using Contilog.Models
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="card post-card mb-3">
+    <div class="card-body">
+        @if (IsEditing)
+        {
+            <!-- Edit Mode -->
+            <EditForm Model="EditModel" OnValidSubmit="OnSave">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                
+                <div class="mb-3">
+                    <label for="post-title" class="form-label">Title</label>
+                    <InputText id="post-title" class="form-control" @bind-Value="EditModel.Title" />
+                </div>
+                
+                <div class="mb-3">
+                    <label for="post-content" class="form-label">Content</label>
+                    <InputTextArea id="post-content" class="form-control post-editor" rows="8" @bind-Value="EditModel.Content" />
+                </div>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="text-muted small">
+                        <div><strong>Author:</strong> @Post.Author</div>
+                        <div><strong>Created:</strong> @Post.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")</div>
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            <span class="oi oi-check" aria-hidden="true"></span>
+                            Save
+                        </button>
+                        <button type="button" class="btn btn-secondary btn-sm" @onclick="OnCancel">
+                            <span class="oi oi-x" aria-hidden="true"></span>
+                            Cancel
+                        </button>
+                    </div>
+                </div>
+            </EditForm>
+        }
+        else
+        {
+            <!-- View Mode -->
+            <div class="post-header d-flex justify-content-between align-items-start">
+                <div class="post-content">
+                    <h6 class="post-title">@Post.Title</h6>
+                    <p class="post-text">@Post.Content</p>
+                </div>
+                <div class="post-meta-top text-end text-muted">
+                    <div class="post-edit-button mb-2">
+                        <button class="btn btn-sm btn-outline-primary" @onclick="OnEdit" title="Edit Post">
+                            <span class="oi oi-pencil" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="post-author">
+                        <strong>@Post.Author</strong>
+                    </div>
+                    <div class="post-date">
+                        @Post.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public Post Post { get; set; } = new();
+    [Parameter] public bool IsEditing { get; set; }
+    [Parameter] public EventCallback<Post> OnEditRequested { get; set; }
+    [Parameter] public EventCallback<Post> OnSaveRequested { get; set; }
+    [Parameter] public EventCallback OnCancelRequested { get; set; }
+
+    private Post EditModel { get; set; } = new();
+
+    protected override void OnParametersSet()
+    {
+        if (IsEditing)
+        {
+            EditModel = new Post
+            {
+                Id = Post.Id,
+                Title = Post.Title,
+                Content = Post.Content,
+                Author = Post.Author,
+                TopicId = Post.TopicId,
+                CreatedDate = Post.CreatedDate
+            };
+        }
+    }
+
+    private async Task OnEdit()
+    {
+        await OnEditRequested.InvokeAsync(Post);
+    }
+
+    private async Task OnSave()
+    {
+        await OnSaveRequested.InvokeAsync(EditModel);
+    }
+
+    private async Task OnCancel()
+    {
+        await OnCancelRequested.InvokeAsync();
+    }
+}
