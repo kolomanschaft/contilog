@@ -1,0 +1,114 @@
+@namespace Contilog.Components
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@implements IAsyncDisposable
+
+<div class="rich-text-editor">
+    <div id="@EditorId" class="quill-editor"></div>
+</div>
+
+@code {
+    [Inject] private IJSRuntime JSRuntime { get; set; } = default!;
+    
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string> ValueChanged { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "Enter your content...";
+    [Parameter] public string EditorId { get; set; } = Guid.NewGuid().ToString("N");
+
+    private DotNetObjectReference<RichTextEditor>? dotNetRef;
+    private bool isInitialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await InitializeEditor();
+        }
+    }
+
+    private async Task InitializeEditor()
+    {
+        try
+        {
+            dotNetRef = DotNetObjectReference.Create(this);
+            
+            // Initialize the Quill editor
+            var success = await JSRuntime.InvokeAsync<bool>("QuillInterop.initialize", EditorId, Placeholder);
+            
+            if (success)
+            {
+                // Set initial content if provided
+                if (!string.IsNullOrEmpty(Value))
+                {
+                    await JSRuntime.InvokeVoidAsync("QuillInterop.setHtml", EditorId, Value);
+                }
+
+                // Setup change callback
+                await JSRuntime.InvokeVoidAsync("QuillInterop.setupChangeCallback", EditorId, dotNetRef, nameof(OnContentChanged));
+                
+                isInitialized = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing rich text editor: {ex.Message}");
+        }
+    }
+
+    [JSInvokable]
+    public async Task OnContentChanged(string html)
+    {
+        Value = html;
+        await ValueChanged.InvokeAsync(html);
+    }
+
+    public async Task<string> GetHtmlAsync()
+    {
+        if (!isInitialized) return Value ?? string.Empty;
+        
+        try
+        {
+            return await JSRuntime.InvokeAsync<string>("QuillInterop.getHtml", EditorId);
+        }
+        catch
+        {
+            return Value ?? string.Empty;
+        }
+    }
+
+    public async Task SetHtmlAsync(string html)
+    {
+        if (!isInitialized) 
+        {
+            Value = html;
+            return;
+        }
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("QuillInterop.setHtml", EditorId, html);
+            Value = html;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error setting HTML: {ex.Message}");
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (isInitialized)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("QuillInterop.dispose", EditorId);
+            }
+            catch
+            {
+                // Ignore disposal errors
+            }
+        }
+
+        dotNetRef?.Dispose();
+    }
+}

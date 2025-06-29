@@ -27,6 +27,41 @@
     color: var(--text-primary);
 }
 
+/* Style HTML content in posts */
+.post-text p {
+    margin-bottom: 0.75rem;
+}
+
+.post-text p:last-child {
+    margin-bottom: 0;
+}
+
+.post-text ul, .post-text ol {
+    margin-bottom: 0.75rem;
+    padding-left: 2rem;
+}
+
+.post-text ul li, .post-text ol li {
+    margin-bottom: 0.25rem;
+}
+
+.post-text strong {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.post-text em {
+    font-style: italic;
+}
+
+.post-text code {
+    background-color: var(--bg-light);
+    padding: 0.125rem 0.25rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+    font-family: 'Courier New', monospace;
+}
+
 .post-meta-top {
     font-size: 0.85rem;
     line-height: 1.2;
