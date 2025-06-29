@@ -4,7 +4,13 @@
 
 <PageTitle>Topics</PageTitle>
 
-<h1>Topics</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Topics</h1>
+    <button class="btn @(archiveMode ? "btn-outline-primary" : "btn-primary")" @onclick="ToggleArchiveMode">
+        <span class="oi @(archiveMode ? "oi-arrow-left" : "oi-box")" aria-hidden="true"></span>
+        @(archiveMode ? "Back" : "Archive")
+    </button>
+</div>
 
 @foreach (var category in categories)
 {
@@ -17,9 +23,7 @@
                 <QuickGrid Items="@GetTopicsByCategory(category)" Class="table topics-table topics-grid">
                     <TemplateColumn Title="Topics" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Title))">
                         <div class="@(context.IsActive ? "" : "text-muted")">
-                            <a href="/topics/@context.Id" class="topic-link">
-                                @context.Title
-                            </a>
+                            @context.Title
                         </div>
                     </TemplateColumn>
                     <TemplateColumn Title="Author" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Author))">
@@ -27,13 +31,22 @@
                             @context.Author
                         </div>
                     </TemplateColumn>
-                    <TemplateColumn Title="Status">
-                        <StatusBadge IsActive="context.IsActive" />
+                    <TemplateColumn Title="Posts" Sortable="true" SortBy="@(GridSort<Topic>.ByDescending(t => GetPostCount(t.Id)))">
+                        <div class="@(context.IsActive ? "" : "text-muted") text-center">
+                            @GetPostCount(context.Id)
+                        </div>
                     </TemplateColumn>
                     <TemplateColumn Title="Actions">
-                        <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteTopic(context.Id)" title="Delete Topic">
-                            <span class="oi oi-trash" aria-hidden="true"></span>
-                        </button>
+                        <div class="topics-action-cell">
+                            <a href="/topics/@context.Id" class="topic-link">
+                                <button class="btn btn-sm btn-outline-primary me-1" title="View Posts">
+                                    <span class="oi oi-eye" aria-hidden="true"></span>
+                                </button>
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteTopic(context.Id)" title="Delete Topic">
+                                <span class="oi oi-trash" aria-hidden="true"></span>
+                            </button>
+                        </div>
                     </TemplateColumn>
                 </QuickGrid>
             </div>
@@ -42,6 +55,8 @@
 }
 
 @code {
+    private bool archiveMode = false;
+
     private IQueryable<Topic> topics = new List<Topic>
     {
         new Topic { Id = 1, Title = "Getting Started with Blazor", Category = "Web Development", Author = "John Doe", CreatedDate = DateTime.Now.AddDays(-30), IsActive = true },
@@ -54,8 +69,23 @@
         new Topic { Id = 8, Title = "Performance Optimization", Category = "Backend", Author = "David Lee", CreatedDate = DateTime.Now.AddDays(-12), IsActive = true }
     }.AsQueryable();
 
+    private List<Post> samplePosts = new List<Post>
+    {
+        new Post { Id = 1, TopicId = 1, Text = "Blazor is a fantastic framework for building interactive web UIs using C#. Here's what I've learned so far...", Author = "Alice Cooper", CreatedDate = DateTime.Now.AddDays(-25) },
+        new Post { Id = 2, TopicId = 1, Text = "Thanks for sharing! I'm also getting started with Blazor. The component model is really intuitive.", Author = "Bob Wilson", CreatedDate = DateTime.Now.AddDays(-24) },
+        new Post { Id = 3, TopicId = 1, Text = "One thing I love about Blazor is how it leverages existing .NET skills. No need to learn a completely new ecosystem.", Author = "Carol Davis", CreatedDate = DateTime.Now.AddDays(-23) },
+        new Post { Id = 4, TopicId = 2, Text = "Here are some key best practices I've discovered for ASP.NET Core development:", Author = "David Miller", CreatedDate = DateTime.Now.AddDays(-10) },
+        new Post { Id = 5, TopicId = 2, Text = "Great points! I'd also add that proper dependency injection setup is crucial for maintainable code.", Author = "Eve Johnson", CreatedDate = DateTime.Now.AddDays(-9) },
+        new Post { Id = 6, TopicId = 3, Text = "Entity Framework can be tricky at first, but these tips have really helped me improve performance.", Author = "Frank Brown", CreatedDate = DateTime.Now.AddDays(-5) },
+        new Post { Id = 7, TopicId = 6, Text = "Docker has revolutionized how I deploy applications. Here's my development workflow...", Author = "Grace Lee", CreatedDate = DateTime.Now.AddDays(-1) },
+        new Post { Id = 8, TopicId = 8, Text = "Performance optimization is critical for user experience. Here are some techniques that work well:", Author = "Henry Clark", CreatedDate = DateTime.Now.AddDays(-8) },
+        new Post { Id = 9, TopicId = 2, Text = "Another important aspect is proper error handling and logging strategies.", Author = "Frank Miller", CreatedDate = DateTime.Now.AddDays(-8) },
+        new Post { Id = 10, TopicId = 3, Text = "Don't forget about indexing for better query performance!", Author = "Sarah Johnson", CreatedDate = DateTime.Now.AddDays(-4) }
+    };
+
     // Extract unique categories and sort them alphabetically
     private List<string> categories => topics
+        .Where(t => t.IsActive != archiveMode)
         .Select(t => t.Category)
         .Distinct()
         .OrderBy(c => c)
@@ -66,20 +96,25 @@
     {
         return topics
             .Where(t => t.Category == category)
+            .Where(t => t.IsActive != archiveMode)
             .OrderByDescending(t => t.IsActive)
             .ThenBy(t => t.ModifiedDate);
     }
 
-    private void EditTopic(int topicId)
+    private int GetPostCount(int topicId)
     {
-        // TODO: Implement edit functionality
-        Console.WriteLine($"Editing topic with ID: {topicId}");
+        return samplePosts.Count(p => p.TopicId == topicId);
     }
 
     private void DeleteTopic(int topicId)
     {
         // TODO: Implement delete functionality
         Console.WriteLine($"Deleting topic with ID: {topicId}");
+    }
+
+    private void ToggleArchiveMode()
+    {
+        archiveMode = !archiveMode;
     }
 }
 
