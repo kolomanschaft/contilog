@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Contilog.Data;
+using Contilog.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+
+// Register repositories
+builder.Services.AddSingleton<ITopicRepository, TopicRepository>();
+builder.Services.AddSingleton<IPostRepository, PostRepository>();
 
 var app = builder.Build();
 

@@ -1,6 +1,10 @@
 @page "/topics"
 @using Contilog.Models
+@using Contilog.Repositories
 @using System.Linq
+@inject ITopicRepository TopicRepository
+@inject IPostRepository PostRepository
+@inject NavigationManager Navigation
 
 <PageTitle>Topics</PageTitle>
 
@@ -12,104 +16,126 @@
     </button>
 </div>
 
-@foreach (var category in categories)
+@if (topics == null)
 {
-    <div class="category-container">
-        <div class="card topics-card">
-            <div class="card-header topics-card-header">
-                <h5 class="card-title topics-card-title">@category</h5>
-            </div>
-            <div class="card-body topics-card-body">
-                <QuickGrid Items="@GetTopicsByCategory(category)" Class="table topics-table topics-grid">
-                    <TemplateColumn Title="Topics" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Title))">
-                        <div class="@(context.IsActive ? "" : "text-muted")">
-                            @context.Title
-                        </div>
-                    </TemplateColumn>
-                    <TemplateColumn Title="Author" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Author))">
-                        <div class="@(context.IsActive ? "" : "text-muted")">
-                            @context.Author
-                        </div>
-                    </TemplateColumn>
-                    <TemplateColumn Title="Posts" Sortable="true" SortBy="@(GridSort<Topic>.ByDescending(t => GetPostCount(t.Id)))">
-                        <div class="@(context.IsActive ? "" : "text-muted") text-center">
-                            @GetPostCount(context.Id)
-                        </div>
-                    </TemplateColumn>
-                    <TemplateColumn Title="Actions">
-                        <div class="topics-action-cell">
-                            <a href="/topics/@context.Id" class="topic-link">
-                                <button class="btn btn-sm btn-outline-primary me-1" title="View Posts">
-                                    <span class="oi oi-eye" aria-hidden="true"></span>
-                                </button>
-                            </a>
-                            <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteTopic(context.Id)" title="Delete Topic">
-                                <span class="oi oi-trash" aria-hidden="true"></span>
-                            </button>
-                        </div>
-                    </TemplateColumn>
-                </QuickGrid>
-            </div>
+    <div class="text-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
         </div>
     </div>
+}
+else
+{
+    @foreach (var category in categories)
+    {
+        <div class="category-container">
+            <div class="card topics-card">
+                <div class="card-header topics-card-header">
+                    <h5 class="card-title topics-card-title">@category</h5>
+                </div>
+                <div class="card-body topics-card-body">
+                    <QuickGrid Items="@GetTopicsByCategory(category)" Class="table topics-table topics-grid">
+                        <TemplateColumn Title="Topics" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Title))">
+                            <div class="@(context.IsActive ? "" : "text-muted")">
+                                @context.Title
+                            </div>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Author" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Author))">
+                            <div class="@(context.IsActive ? "" : "text-muted")">
+                                @context.Author
+                            </div>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Posts" Sortable="true" SortBy="@(GridSort<Topic>.ByDescending(t => GetPostCount(t.Id)))">
+                            <div class="@(context.IsActive ? "" : "text-muted") text-center">
+                                @GetPostCount(context.Id)
+                            </div>
+                        </TemplateColumn>
+                        <TemplateColumn Title="Actions">
+                            <div class="topics-action-cell">
+                                <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => ViewPosts(context.Id)" title="View Posts">
+                                    <span class="oi oi-eye" aria-hidden="true"></span>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteTopic(context.Id)" title="Delete Topic">
+                                    <span class="oi oi-trash" aria-hidden="true"></span>
+                                </button>
+                            </div>
+                        </TemplateColumn>
+                    </QuickGrid>
+                </div>
+            </div>
+        </div>
+    }
 }
 
 @code {
     private bool archiveMode = false;
+    private List<Topic>? topics;
+    private Dictionary<int, int> postCounts = new();
 
-    private IQueryable<Topic> topics = new List<Topic>
+    protected override async Task OnInitializedAsync()
     {
-        new Topic { Id = 1, Title = "Getting Started with Blazor", Category = "Web Development", Author = "John Doe", CreatedDate = DateTime.Now.AddDays(-30), IsActive = true },
-        new Topic { Id = 2, Title = "ASP.NET Core Best Practices", Category = "Backend", Author = "Jane Smith", CreatedDate = DateTime.Now.AddDays(-15), IsActive = true },
-        new Topic { Id = 3, Title = "Entity Framework Tips", Category = "Database", Author = "Mike Johnson", CreatedDate = DateTime.Now.AddDays(-7), IsActive = true },
-        new Topic { Id = 4, Title = "CSS Grid Layout", Category = "Frontend", Author = "Sarah Wilson", CreatedDate = DateTime.Now.AddDays(-45), IsActive = false },
-        new Topic { Id = 5, Title = "JavaScript ES6 Features", Category = "Frontend", Author = "Alex Brown", CreatedDate = DateTime.Now.AddDays(-22), IsActive = true },
-        new Topic { Id = 6, Title = "Docker for Developers", Category = "DevOps", Author = "Chris Davis", CreatedDate = DateTime.Now.AddDays(-3), IsActive = true },
-        new Topic { Id = 7, Title = "Testing Strategies", Category = "Quality Assurance", Author = "Emma Miller", CreatedDate = DateTime.Now.AddDays(-60), IsActive = false },
-        new Topic { Id = 8, Title = "Performance Optimization", Category = "Backend", Author = "David Lee", CreatedDate = DateTime.Now.AddDays(-12), IsActive = true }
-    }.AsQueryable();
+        await LoadTopicsAsync();
+    }
 
-    private List<Post> samplePosts = new List<Post>
+    private async Task LoadTopicsAsync()
     {
-        new Post { Id = 1, TopicId = 1, Text = "Blazor is a fantastic framework for building interactive web UIs using C#. Here's what I've learned so far...", Author = "Alice Cooper", CreatedDate = DateTime.Now.AddDays(-25) },
-        new Post { Id = 2, TopicId = 1, Text = "Thanks for sharing! I'm also getting started with Blazor. The component model is really intuitive.", Author = "Bob Wilson", CreatedDate = DateTime.Now.AddDays(-24) },
-        new Post { Id = 3, TopicId = 1, Text = "One thing I love about Blazor is how it leverages existing .NET skills. No need to learn a completely new ecosystem.", Author = "Carol Davis", CreatedDate = DateTime.Now.AddDays(-23) },
-        new Post { Id = 4, TopicId = 2, Text = "Here are some key best practices I've discovered for ASP.NET Core development:", Author = "David Miller", CreatedDate = DateTime.Now.AddDays(-10) },
-        new Post { Id = 5, TopicId = 2, Text = "Great points! I'd also add that proper dependency injection setup is crucial for maintainable code.", Author = "Eve Johnson", CreatedDate = DateTime.Now.AddDays(-9) },
-        new Post { Id = 6, TopicId = 3, Text = "Entity Framework can be tricky at first, but these tips have really helped me improve performance.", Author = "Frank Brown", CreatedDate = DateTime.Now.AddDays(-5) },
-        new Post { Id = 7, TopicId = 6, Text = "Docker has revolutionized how I deploy applications. Here's my development workflow...", Author = "Grace Lee", CreatedDate = DateTime.Now.AddDays(-1) },
-        new Post { Id = 8, TopicId = 8, Text = "Performance optimization is critical for user experience. Here are some techniques that work well:", Author = "Henry Clark", CreatedDate = DateTime.Now.AddDays(-8) },
-        new Post { Id = 9, TopicId = 2, Text = "Another important aspect is proper error handling and logging strategies.", Author = "Frank Miller", CreatedDate = DateTime.Now.AddDays(-8) },
-        new Post { Id = 10, TopicId = 3, Text = "Don't forget about indexing for better query performance!", Author = "Sarah Johnson", CreatedDate = DateTime.Now.AddDays(-4) }
-    };
+        var allTopics = await TopicRepository.GetAllTopicsAsync();
+        topics = allTopics.ToList();
+
+        // Load post counts for all topics
+        postCounts.Clear();
+        foreach (var topic in topics)
+        {
+            var count = await PostRepository.GetPostCountByTopicIdAsync(topic.Id);
+            postCounts[topic.Id] = count;
+        }
+
+        StateHasChanged();
+    }
 
     // Extract unique categories and sort them alphabetically
-    private List<string> categories => topics
+    private List<string> categories => topics?
         .Where(t => t.IsActive != archiveMode)
         .Select(t => t.Category)
         .Distinct()
         .OrderBy(c => c)
-        .ToList();
+        .ToList() ?? new List<string>();
 
     // Filter topics by category
     private IQueryable<Topic> GetTopicsByCategory(string category)
     {
+        if (topics == null) return new List<Topic>().AsQueryable();
+
         return topics
             .Where(t => t.Category == category)
             .Where(t => t.IsActive != archiveMode)
             .OrderByDescending(t => t.IsActive)
-            .ThenBy(t => t.ModifiedDate);
+            .ThenByDescending(t => t.CreatedDate)
+            .AsQueryable();
     }
 
     private int GetPostCount(int topicId)
     {
-        return samplePosts.Count(p => p.TopicId == topicId);
+        return postCounts.TryGetValue(topicId, out var count) ? count : 0;
     }
 
-    private void DeleteTopic(int topicId)
+    private async Task DeleteTopic(int topicId)
     {
-        // TODO: Implement delete functionality
-        Console.WriteLine($"Deleting topic with ID: {topicId}");
+        var success = await TopicRepository.DeleteTopicAsync(topicId);
+        if (success)
+        {
+            await LoadTopicsAsync(); // Reload topics after deletion
+        }
+        else
+        {
+            // TODO: Show error message to user
+            Console.WriteLine($"Failed to delete topic with ID: {topicId}");
+        }
+    }
+
+    private void ViewPosts(int topicId)
+    {
+        Navigation.NavigateTo($"/topics/{topicId}");
     }
 
     private void ToggleArchiveMode()

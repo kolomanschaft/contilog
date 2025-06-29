@@ -1,6 +1,9 @@
 @page "/topics/{topicId:int}"
 @using Contilog.Models
+@using Contilog.Repositories
 @using System.Linq
+@inject ITopicRepository TopicRepository
+@inject IPostRepository PostRepository
 
 <PageTitle>@topicTitle</PageTitle>
 
@@ -65,7 +68,8 @@ else
                         <div class="card-body">
                             <div class="post-header d-flex justify-content-between align-items-start">
                                 <div class="post-content">
-                                    <p class="post-text">@post.Text</p>
+                                    <h6 class="post-title">@post.Title</h6>
+                                    <p class="post-text">@post.Content</p>
                                 </div>
                                 <div class="post-meta-top text-end text-muted">
                                     <div class="post-edit-button mb-2">
@@ -104,48 +108,34 @@ else
 
     private Topic? topic;
     private string topicTitle = "Topic Details";
-    private IEnumerable<Post> posts = new List<Post>();
+    private List<Post> posts = new();
 
-    // Sample data - in a real app, this would come from a database
-    private List<Topic> topics = new List<Topic>
+    protected override async Task OnInitializedAsync()
     {
-        new Topic { Id = 1, Title = "Getting Started with Blazor", Category = "Web Development", Author = "John Doe", CreatedDate = DateTime.Now.AddDays(-30), IsActive = true },
-        new Topic { Id = 2, Title = "ASP.NET Core Best Practices", Category = "Backend", Author = "Jane Smith", CreatedDate = DateTime.Now.AddDays(-15), IsActive = true },
-        new Topic { Id = 3, Title = "Entity Framework Tips", Category = "Database", Author = "Mike Johnson", CreatedDate = DateTime.Now.AddDays(-7), IsActive = true },
-        new Topic { Id = 4, Title = "CSS Grid Layout", Category = "Frontend", Author = "Sarah Wilson", CreatedDate = DateTime.Now.AddDays(-45), IsActive = false },
-        new Topic { Id = 5, Title = "JavaScript ES6 Features", Category = "Frontend", Author = "Alex Brown", CreatedDate = DateTime.Now.AddDays(-22), IsActive = true },
-        new Topic { Id = 6, Title = "Docker for Developers", Category = "DevOps", Author = "Chris Davis", CreatedDate = DateTime.Now.AddDays(-3), IsActive = true },
-        new Topic { Id = 7, Title = "Testing Strategies", Category = "Quality Assurance", Author = "Emma Miller", CreatedDate = DateTime.Now.AddDays(-60), IsActive = false },
-        new Topic { Id = 8, Title = "Performance Optimization", Category = "Backend", Author = "David Lee", CreatedDate = DateTime.Now.AddDays(-12), IsActive = true }
-    };
-
-    private List<Post> samplePosts = new List<Post>
-    {
-        new Post { Id = 1, TopicId = 1, Text = "Blazor is a fantastic framework for building interactive web UIs using C#. Here's what I've learned so far...", Author = "Alice Cooper", CreatedDate = DateTime.Now.AddDays(-25) },
-        new Post { Id = 2, TopicId = 1, Text = "Thanks for sharing! I'm also getting started with Blazor. The component model is really intuitive.", Author = "Bob Wilson", CreatedDate = DateTime.Now.AddDays(-24) },
-        new Post { Id = 3, TopicId = 1, Text = "One thing I love about Blazor is how it leverages existing .NET skills. No need to learn a completely new ecosystem.", Author = "Carol Davis", CreatedDate = DateTime.Now.AddDays(-23) },
-        new Post { Id = 4, TopicId = 2, Text = "Here are some key best practices I've discovered for ASP.NET Core development:", Author = "David Miller", CreatedDate = DateTime.Now.AddDays(-10) },
-        new Post { Id = 5, TopicId = 2, Text = "Great points! I'd also add that proper dependency injection setup is crucial for maintainable code.", Author = "Eve Johnson", CreatedDate = DateTime.Now.AddDays(-9) },
-        new Post { Id = 6, TopicId = 3, Text = "Entity Framework can be tricky at first, but these tips have really helped me improve performance.", Author = "Frank Brown", CreatedDate = DateTime.Now.AddDays(-5) },
-        new Post { Id = 7, TopicId = 6, Text = "Docker has revolutionized how I deploy applications. Here's my development workflow...", Author = "Grace Lee", CreatedDate = DateTime.Now.AddDays(-1) },
-        new Post { Id = 8, TopicId = 8, Text = "Performance optimization is critical for user experience. Here are some techniques that work well:", Author = "Henry Clark", CreatedDate = DateTime.Now.AddDays(-8) }
-    };
-
-    protected override void OnInitialized()
-    {
-        LoadTopicData();
+        await LoadTopicDataAsync();
     }
 
-    private void LoadTopicData()
+    protected override async Task OnParametersSetAsync()
     {
-        topic = topics.FirstOrDefault(t => t.Id == TopicId);
+        await LoadTopicDataAsync();
+    }
+
+    private async Task LoadTopicDataAsync()
+    {
+        topic = await TopicRepository.GetTopicByIdAsync(TopicId);
         if (topic != null)
         {
             topicTitle = topic.Title;
-            posts = samplePosts
-                .Where(p => p.TopicId == TopicId)
-                .OrderBy(p => p.CreatedDate);
+            var topicPosts = await PostRepository.GetPostsByTopicIdAsync(TopicId);
+            posts = topicPosts.ToList();
         }
+        else
+        {
+            topicTitle = "Topic Not Found";
+            posts = new List<Post>();
+        }
+
+        StateHasChanged();
     }
 
     private void AddNewPost()

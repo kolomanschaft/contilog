@@ -1,0 +1,11 @@
+using Contilog.Models;
+
+namespace Contilog.Repositories
+{
+    public interface ITopicRepository
+    {
+        Task<IEnumerable<Topic>> GetAllTopicsAsync();
+        Task<Topic?> GetTopicByIdAsync(int id);
+        Task<bool> DeleteTopicAsync(int id);
+    }
+}
