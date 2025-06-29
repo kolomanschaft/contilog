@@ -1,4 +1,9 @@
 /* Topics page styling */
+.topics-header {
+    max-width: var(--card-max-width);
+    margin: 0 auto 2rem auto;
+}
+
 .topics-grid {
     background-color: var(--bg-muted);
     table-layout: fixed;
