@@ -51,5 +51,18 @@ namespace Contilog.Repositories
             var count = _posts.Count(p => p.TopicId == topicId);
             return Task.FromResult(count);
         }
+
+        public Task<bool> UpdatePostAsync(Post post)
+        {
+            var existingPost = _posts.FirstOrDefault(p => p.Id == post.Id);
+            if (existingPost != null)
+            {
+                existingPost.Title = post.Title;
+                existingPost.Content = post.Content;
+                // Note: We don't update Author or CreatedDate for existing posts
+                return Task.FromResult(true);
+            }
+            return Task.FromResult(false);
+        }
     }
 }

@@ -6,5 +6,6 @@ namespace Contilog.Repositories
     {
         Task<IEnumerable<Post>> GetPostsByTopicIdAsync(int topicId);
         Task<int> GetPostCountByTopicIdAsync(int topicId);
+        Task<bool> UpdatePostAsync(Post post);
     }
 }
