@@ -13,8 +13,38 @@
                 
                 <div class="mb-3">
                     <label class="form-label">Content</label>
-                    <RichTextEditor @bind-Value="EditModel.Content" 
-                                    Placeholder="Enter your post content..." />
+                    <BlazoredTextEditor @ref="textEditor"
+                                        Placeholder="Enter your post content..."
+                                        Theme="snow"
+                                        DebugLevel="error">
+                        <ToolbarContent>
+                            <select class="ql-header">
+                                <option selected=""></option>
+                                <option value="1"></option>
+                                <option value="2"></option>
+                                <option value="3"></option>
+                            </select>
+                            <span class="ql-formats">
+                                <button class="ql-bold"></button>
+                                <button class="ql-italic"></button>
+                                <button class="ql-underline"></button>
+                                <button class="ql-strike"></button>
+                            </span>
+                            <span class="ql-formats">
+                                <button class="ql-list" value="ordered"></button>
+                                <button class="ql-list" value="bullet"></button>
+                            </span>
+                            <span class="ql-formats">
+                                <button class="ql-link"></button>
+                            </span>
+                            <span class="ql-formats">
+                                <button class="ql-clean"></button>
+                            </span>
+                        </ToolbarContent>
+                        <EditorContent>
+                            @((MarkupString)(EditModel.Content ?? string.Empty))
+                        </EditorContent>
+                    </BlazoredTextEditor>
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-center">
@@ -76,8 +106,9 @@
     [Parameter] public EventCallback OnCancelRequested { get; set; }
 
     private Post EditModel { get; set; } = new();
+    private BlazoredTextEditor? textEditor;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
         if (IsEditing)
         {
@@ -90,6 +121,13 @@
                 CreatedDate = Post.CreatedDate
             };
         }
+        await Task.CompletedTask;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Let the editor initialize naturally with the content in EditorContent
+        await Task.CompletedTask;
     }
 
     private async Task OnEdit()
@@ -99,6 +137,10 @@
 
     private async Task OnSave()
     {
+        if (textEditor != null)
+        {
+            EditModel.Content = await textEditor.GetHTML();
+        }
         await OnSaveRequested.InvokeAsync(EditModel);
     }
 
