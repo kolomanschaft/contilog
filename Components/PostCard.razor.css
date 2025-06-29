@@ -75,9 +75,14 @@
 }
 
 .post-edit-button .btn {
-    font-size: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    line-height: 1;
+    font-size: 1rem;
+    padding: 0.5rem 0.75rem;
+    line-height: 1.2;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .post-meta-top .post-author {

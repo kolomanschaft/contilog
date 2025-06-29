@@ -23,7 +23,7 @@ else
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title mb-0">@topic.Title</h4>
-                <a href="/topics" class="btn btn-primary btn-sm">
+                <a href="/topics" class="btn btn-primary">
                     <span class="oi oi-arrow-left" aria-hidden="true"></span>
                     Back to Topics
                 </a>
@@ -73,7 +73,7 @@ else
         @if (topic.IsActive)
         {
             <div class="d-flex justify-content-center mt-4">
-                <button class="btn btn-primary" @onclick="AddNewPost">
+                <button class="btn btn-primary btn-lg" @onclick="AddNewPost">
                     <span class="oi oi-plus" aria-hidden="true"></span>
                     Add Post
                 </button>
