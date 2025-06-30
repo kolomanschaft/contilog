@@ -18,20 +18,4 @@ namespace Contilog.Handlers.Categories
             return new GetAllCategoriesResponse(categories);
         }
     }
-
-    public class GetCategoryByIdHandler : IGetCategoryByIdHandler
-    {
-        private readonly ICategoryRepository _categoryRepository;
-
-        public GetCategoryByIdHandler(ICategoryRepository categoryRepository)
-        {
-            _categoryRepository = categoryRepository;
-        }
-
-        public async Task<GetCategoryByIdResponse> Handle(GetCategoryByIdRequest request)
-        {
-            var category = await _categoryRepository.GetCategoryByIdAsync(request.CategoryId);
-            return new GetCategoryByIdResponse(category);
-        }
-    }
 }

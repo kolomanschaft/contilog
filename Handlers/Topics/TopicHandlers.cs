@@ -19,22 +19,6 @@ namespace Contilog.Handlers.Topics
         }
     }
 
-    public class GetTopicByIdHandler : IGetTopicByIdHandler
-    {
-        private readonly ITopicRepository _topicRepository;
-
-        public GetTopicByIdHandler(ITopicRepository topicRepository)
-        {
-            _topicRepository = topicRepository;
-        }
-
-        public async Task<GetTopicByIdResponse> Handle(GetTopicByIdRequest request)
-        {
-            var topic = await _topicRepository.GetTopicByIdAsync(request.TopicId);
-            return new GetTopicByIdResponse(topic);
-        }
-    }
-
     public class CreateTopicHandler : ICreateTopicHandler
     {
         private readonly ITopicRepository _topicRepository;

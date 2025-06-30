@@ -7,7 +7,6 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.AspNetCore.Components.Web
 @inject IGetAllTopicsHandler GetAllTopicsHandler
-@inject IGetTopicByIdHandler GetTopicByIdHandler
 @inject ICreateTopicHandler CreateTopicHandler
 @inject IArchiveTopicHandler ArchiveTopicHandler
 @inject IDeleteTopicHandler DeleteTopicHandler
@@ -92,20 +91,11 @@ else
                         </TemplateColumn>
                     </QuickGrid>
                     
-                    @if (addingTopicToCategoryId == category.Id)
-                    {
-                        <div class="py-2 border-top">
-                            <div class="d-flex align-items-center gap-2 ps-2">
-                                <input type="text" class="form-control form-control-sm topic-input" @bind="newTopicTitle" @onkeypress="OnNewTopicKeyPress" placeholder="Enter topic title..." />
-                                <button class="btn btn-sm btn-success flex-shrink-0" @onclick="() => SaveNewTopic(category.Id)" title="Save Topic">
-                                    <span class="oi oi-check" aria-hidden="true"></span>
-                                </button>
-                                <button class="btn btn-sm btn-secondary flex-shrink-0 me-2" @onclick="CancelNewTopic" title="Cancel">
-                                    <span class="oi oi-x" aria-hidden="true"></span>
-                                </button>
-                            </div>
-                        </div>
-                    }
+                    <StringEditor 
+                        IsVisible="addingTopicToCategoryId == category.Id"
+                        Placeholder="Enter topic title..."
+                        OnTextSubmitted="(title) => OnTopicTitleSubmitted(title, category.Id)"
+                        OnCancelled="CancelNewTopic" />
                     
                     @if (category.IsActive && addingTopicToCategoryId != category.Id)
                     {
@@ -157,7 +147,6 @@ else
     
     // Add new topic
     private int? addingTopicToCategoryId = null;
-    private string newTopicTitle = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -319,23 +308,21 @@ else
     private void StartAddingTopic(int categoryId)
     {
         addingTopicToCategoryId = categoryId;
-        newTopicTitle = string.Empty;
         StateHasChanged();
     }
 
     private void CancelNewTopic()
     {
         addingTopicToCategoryId = null;
-        newTopicTitle = string.Empty;
         StateHasChanged();
     }
 
-    private async Task SaveNewTopic(int categoryId)
+    private async Task OnTopicTitleSubmitted(string title, int categoryId)
     {
-        if (!string.IsNullOrWhiteSpace(newTopicTitle))
+        if (!string.IsNullOrWhiteSpace(title))
         {
             var createTopicRequest = new CreateTopicRequest(
-                newTopicTitle.Trim(),
+                title.Trim(),
                 categoryId,
                 "Kylo Ren" // TODO: Get from authentication
             );
@@ -351,7 +338,6 @@ else
                 
                 // Exit add mode
                 addingTopicToCategoryId = null;
-                newTopicTitle = string.Empty;
                 StateHasChanged();
             }
             else
@@ -359,18 +345,6 @@ else
                 // TODO: Show error message to user
                 Console.WriteLine("Failed to create new topic");
             }
-        }
-    }
-
-    private async Task OnNewTopicKeyPress(KeyboardEventArgs e)
-    {
-        if (e.Key == "Enter" && addingTopicToCategoryId.HasValue)
-        {
-            await SaveNewTopic(addingTopicToCategoryId.Value);
-        }
-        else if (e.Key == "Escape")
-        {
-            CancelNewTopic();
         }
     }
 }

@@ -1,0 +1,62 @@
+@namespace Contilog.Components
+@using Microsoft.AspNetCore.Components.Web
+
+@if (IsVisible)
+{
+    <div class="py-2 border-top">
+        <div class="d-flex align-items-center gap-2 ps-2">
+            <input type="text" class="form-control form-control-sm topic-input" @bind="inputText" @onkeypress="OnKeyPress" placeholder="@Placeholder" />
+            <button class="btn btn-sm btn-success flex-shrink-0" @onclick="SubmitText" title="Save">
+                <span class="oi oi-check" aria-hidden="true"></span>
+            </button>
+            <button class="btn btn-sm btn-secondary flex-shrink-0 me-2" @onclick="Cancel" title="Cancel">
+                <span class="oi oi-x" aria-hidden="true"></span>
+            </button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public string Placeholder { get; set; } = "Enter text...";
+    [Parameter] public EventCallback<string> OnTextSubmitted { get; set; }
+    [Parameter] public EventCallback OnCancelled { get; set; }
+
+    private string inputText = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        if (IsVisible)
+        {
+            inputText = string.Empty;
+        }
+    }
+
+    private async Task SubmitText()
+    {
+        if (!string.IsNullOrWhiteSpace(inputText))
+        {
+            var text = inputText.Trim();
+            inputText = string.Empty;
+            await OnTextSubmitted.InvokeAsync(text);
+        }
+    }
+
+    private async Task Cancel()
+    {
+        inputText = string.Empty;
+        await OnCancelled.InvokeAsync();
+    }
+
+    private async Task OnKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await SubmitText();
+        }
+        else if (e.Key == "Escape")
+        {
+            await Cancel();
+        }
+    }
+}
