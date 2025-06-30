@@ -29,5 +29,21 @@ namespace Contilog.Repositories
             var category = _categories.FirstOrDefault(c => c.Id == id);
             return await Task.FromResult(category);
         }
+
+        public Task<Category?> UpdateCategoryAsync(Category category)
+        {
+            var existingCategory = _categories.FirstOrDefault(c => c.Id == category.Id);
+            if (existingCategory == null)
+            {
+                return Task.FromResult<Category?>(null);
+            }
+
+            // Update the existing category
+            existingCategory.Name = category.Name;
+            existingCategory.Description = category.Description;
+            existingCategory.IsActive = category.IsActive;
+
+            return Task.FromResult<Category?>(existingCategory);
+        }
     }
 }

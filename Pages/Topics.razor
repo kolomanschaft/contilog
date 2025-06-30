@@ -3,6 +3,7 @@
 @using Contilog.Handlers.Topics
 @using Contilog.Handlers.Categories
 @using Contilog.Handlers.Posts
+@using Contilog.Components
 @using System.Linq
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.AspNetCore.Components.Web
@@ -11,6 +12,7 @@
 @inject IArchiveTopicHandler ArchiveTopicHandler
 @inject IDeleteTopicHandler DeleteTopicHandler
 @inject IGetAllCategoriesHandler GetAllCategoriesHandler
+@inject IUpdateCategoryHandler UpdateCategoryHandler
 @inject IGetPostCountByTopicIdHandler GetPostCountByTopicIdHandler
 @inject NavigationManager Navigation
 
@@ -41,13 +43,34 @@ else
         <div class="category-container">
             <div class="card topics-card">
                 <div class="card-header topics-card-header">
-                    <h5 class="card-title topics-card-title @(category.IsActive ? "" : "text-muted")">
-                        @category.Name
-                        @if (!category.IsActive)
-                        {
-                            <span class="badge bg-secondary ms-2">Archived</span>
-                        }
-                    </h5>
+                    @if (editingCategoryId == category.Id)
+                    {
+                        @* Category name editor *@
+                        <StringEditor 
+                            IsVisible="true"
+                            Placeholder="Enter category name..."
+                            InitialValue="@category.Name"
+                            OnTextSubmitted="(name) => OnCategoryNameSubmitted(name, category.Id)"
+                            OnCancelled="CancelEditCategory" />
+                    }
+                    else
+                    {
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title topics-card-title @(category.IsActive ? "" : "text-muted") mb-0">
+                                @category.Name
+                                @if (!category.IsActive)
+                                {
+                                    <span class="badge bg-secondary ms-2">Archived</span>
+                                }
+                            </h5>
+                            @if (category.IsActive)
+                            {
+                                <button class="btn btn-sm btn-outline-secondary" @onclick="() => StartEditingCategory(category.Id)" title="Edit Category Name">
+                                    <span class="oi oi-pencil" aria-hidden="true"></span>
+                                </button>
+                            }
+                        </div>
+                    }
                 </div>
                 <div class="card-body topics-card-body">
                     <QuickGrid Items="@GetTopicsByCategory(category)" Class="table topics-table topics-grid">
@@ -147,6 +170,9 @@ else
     
     // Add new topic
     private int? addingTopicToCategoryId = null;
+    
+    // Edit category
+    private int? editingCategoryId = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -344,6 +370,47 @@ else
             {
                 // TODO: Show error message to user
                 Console.WriteLine("Failed to create new topic");
+            }
+        }
+    }
+    
+    // Category editing methods
+    private void StartEditingCategory(int categoryId)
+    {
+        editingCategoryId = categoryId;
+        StateHasChanged();
+    }
+
+    private void CancelEditCategory()
+    {
+        editingCategoryId = null;
+        StateHasChanged();
+    }
+
+    private async Task OnCategoryNameSubmitted(string name, int categoryId)
+    {
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            var updateCategoryRequest = new UpdateCategoryRequest(categoryId, name.Trim());
+            var updateCategoryResponse = await UpdateCategoryHandler.Handle(updateCategoryRequest);
+            
+            if (updateCategoryResponse.Success && updateCategoryResponse.Category != null)
+            {
+                // Update the local category list
+                var category = categories?.FirstOrDefault(c => c.Id == categoryId);
+                if (category != null)
+                {
+                    category.Name = updateCategoryResponse.Category.Name;
+                }
+                
+                // Exit edit mode
+                editingCategoryId = null;
+                StateHasChanged();
+            }
+            else
+            {
+                // TODO: Show error message to user
+                Console.WriteLine("Failed to update category name");
             }
         }
     }

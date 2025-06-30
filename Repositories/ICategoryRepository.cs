@@ -6,5 +6,6 @@ namespace Contilog.Repositories
     {
         Task<IEnumerable<Category>> GetAllCategoriesAsync();
         Task<Category?> GetCategoryByIdAsync(int id);
+        Task<Category?> UpdateCategoryAsync(Category category);
     }
 }

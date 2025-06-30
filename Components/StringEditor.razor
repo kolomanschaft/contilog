@@ -19,6 +19,7 @@
 @code {
     [Parameter] public bool IsVisible { get; set; }
     [Parameter] public string Placeholder { get; set; } = "Enter text...";
+    [Parameter] public string InitialValue { get; set; } = string.Empty;
     [Parameter] public EventCallback<string> OnTextSubmitted { get; set; }
     [Parameter] public EventCallback OnCancelled { get; set; }
 
@@ -28,7 +29,7 @@
     {
         if (IsVisible)
         {
-            inputText = string.Empty;
+            inputText = InitialValue ?? string.Empty;
         }
     }
 
