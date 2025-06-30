@@ -54,16 +54,25 @@ namespace Contilog.Handlers.Posts
     public class CreatePostHandler : ICreatePostHandler
     {
         private readonly IPostRepository _postRepository;
+        private readonly ITopicRepository _topicRepository;
 
-        public CreatePostHandler(IPostRepository postRepository)
+        public CreatePostHandler(IPostRepository postRepository, ITopicRepository topicRepository)
         {
             _postRepository = postRepository;
+            _topicRepository = topicRepository;
         }
 
         public async Task<CreatePostResponse> Handle(CreatePostRequest request)
         {
             // Business logic: validate the request
             if (string.IsNullOrWhiteSpace(request.Content))
+            {
+                return new CreatePostResponse(null, false);
+            }
+
+            // Validate that the topic exists
+            var topic = await _topicRepository.GetTopicByIdAsync(request.TopicId);
+            if (topic == null)
             {
                 return new CreatePostResponse(null, false);
             }
