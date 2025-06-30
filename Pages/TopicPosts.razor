@@ -110,15 +110,15 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadTopicDataAsync();
+        await LoadTopicData();
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        await LoadTopicDataAsync();
+        await LoadTopicData();
     }
 
-    private async Task LoadTopicDataAsync()
+    private async Task LoadTopicData()
     {
         topic = await TopicRepository.GetTopicByIdAsync(TopicId);
         if (topic != null)

@@ -137,23 +137,23 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadTopicsAsync();
+        await LoadTopics();
     }
 
-    private async Task LoadTopicsAsync()
+    private async Task LoadTopics()
     {
         var getAllCategoriesRequest = new GetAllCategoriesRequest();
-        var getAllCategoriesResponse = await GetAllCategoriesHandler.HandleAsync(getAllCategoriesRequest);
+        var getAllCategoriesResponse = await GetAllCategoriesHandler.Handle(getAllCategoriesRequest);
         categories = getAllCategoriesResponse.Categories.ToList();
         
         var getAllTopicsRequest = new GetAllTopicsRequest();
-        var getAllTopicsResponse = await GetAllTopicsHandler.HandleAsync(getAllTopicsRequest);
+        var getAllTopicsResponse = await GetAllTopicsHandler.Handle(getAllTopicsRequest);
         topics = getAllTopicsResponse.Topics.ToList();
         postCounts.Clear();
         foreach (var topic in topics)
         {
             var getPostCountRequest = new GetPostCountByTopicIdRequest(topic.Id);
-            var getPostCountResponse = await GetPostCountByTopicIdHandler.HandleAsync(getPostCountRequest);
+            var getPostCountResponse = await GetPostCountByTopicIdHandler.Handle(getPostCountRequest);
             postCounts[topic.Id] = getPostCountResponse.Count;
         }
 
@@ -229,10 +229,10 @@ else
     private async Task DeleteTopic(int topicId)
     {
         var deleteTopicRequest = new DeleteTopicRequest(topicId);
-        var deleteTopicResponse = await DeleteTopicHandler.HandleAsync(deleteTopicRequest);
+        var deleteTopicResponse = await DeleteTopicHandler.Handle(deleteTopicRequest);
         if (deleteTopicResponse.Success)
         {
-            await LoadTopicsAsync(); // Reload topics after deletion
+            await LoadTopics(); // Reload topics after deletion
         }
         else
         {
@@ -276,7 +276,7 @@ else
                 "Kylo Ren" // TODO: Get from authentication
             );
 
-            var createTopicResponse = await CreateTopicHandler.HandleAsync(createTopicRequest);
+            var createTopicResponse = await CreateTopicHandler.Handle(createTopicRequest);
             if (createTopicResponse.Success && createTopicResponse.Topic != null)
             {
                 // Add to local list

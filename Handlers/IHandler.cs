@@ -2,11 +2,11 @@ namespace Contilog.Handlers
 {
     public interface IHandler<TRequest, TResponse>
     {
-        Task<TResponse> HandleAsync(TRequest request);
+        Task<TResponse> Handle(TRequest request);
     }
 
     public interface IHandler<TRequest>
     {
-        Task HandleAsync(TRequest request);
+        Task Handle(TRequest request);
     }
 }

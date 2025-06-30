@@ -12,7 +12,7 @@ namespace Contilog.Handlers.Topics
             _topicRepository = topicRepository;
         }
 
-        public async Task<GetAllTopicsResponse> HandleAsync(GetAllTopicsRequest request)
+        public async Task<GetAllTopicsResponse> Handle(GetAllTopicsRequest request)
         {
             var topics = await _topicRepository.GetAllTopicsAsync();
             return new GetAllTopicsResponse(topics);
@@ -28,7 +28,7 @@ namespace Contilog.Handlers.Topics
             _topicRepository = topicRepository;
         }
 
-        public async Task<GetTopicByIdResponse> HandleAsync(GetTopicByIdRequest request)
+        public async Task<GetTopicByIdResponse> Handle(GetTopicByIdRequest request)
         {
             var topic = await _topicRepository.GetTopicByIdAsync(request.TopicId);
             return new GetTopicByIdResponse(topic);
@@ -44,7 +44,7 @@ namespace Contilog.Handlers.Topics
             _topicRepository = topicRepository;
         }
 
-        public async Task<CreateTopicResponse> HandleAsync(CreateTopicRequest request)
+        public async Task<CreateTopicResponse> Handle(CreateTopicRequest request)
         {
             // Business logic: validate the request
             if (string.IsNullOrWhiteSpace(request.Title))
@@ -77,7 +77,7 @@ namespace Contilog.Handlers.Topics
             _topicRepository = topicRepository;
         }
 
-        public async Task<DeleteTopicResponse> HandleAsync(DeleteTopicRequest request)
+        public async Task<DeleteTopicResponse> Handle(DeleteTopicRequest request)
         {
             // Business logic: could add validation here (e.g., check permissions, soft delete, etc.)
             var success = await _topicRepository.DeleteTopicAsync(request.TopicId);

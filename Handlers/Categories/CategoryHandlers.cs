@@ -12,7 +12,7 @@ namespace Contilog.Handlers.Categories
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<GetAllCategoriesResponse> HandleAsync(GetAllCategoriesRequest request)
+        public async Task<GetAllCategoriesResponse> Handle(GetAllCategoriesRequest request)
         {
             var categories = await _categoryRepository.GetAllCategoriesAsync();
             return new GetAllCategoriesResponse(categories);
@@ -28,7 +28,7 @@ namespace Contilog.Handlers.Categories
             _categoryRepository = categoryRepository;
         }
 
-        public async Task<GetCategoryByIdResponse> HandleAsync(GetCategoryByIdRequest request)
+        public async Task<GetCategoryByIdResponse> Handle(GetCategoryByIdRequest request)
         {
             var category = await _categoryRepository.GetCategoryByIdAsync(request.CategoryId);
             return new GetCategoryByIdResponse(category);
