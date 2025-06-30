@@ -9,4 +9,8 @@ namespace Contilog.Handlers.Categories
     public interface IUpdateCategoryHandler : IHandler<UpdateCategoryRequest, UpdateCategoryResponse>
     {
     }
+    
+    public interface IArchiveCategoryHandler : IHandler<ArchiveCategoryRequest, ArchiveCategoryResponse>
+    {
+    }
 }

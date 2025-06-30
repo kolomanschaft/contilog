@@ -51,4 +51,44 @@ namespace Contilog.Handlers.Categories
             return new UpdateCategoryResponse(updatedCategory, updatedCategory != null);
         }
     }
+
+    public class ArchiveCategoryHandler : IArchiveCategoryHandler
+    {
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly ITopicRepository _topicRepository;
+
+        public ArchiveCategoryHandler(ICategoryRepository categoryRepository, ITopicRepository topicRepository)
+        {
+            _categoryRepository = categoryRepository;
+            _topicRepository = topicRepository;
+        }
+
+        public async Task<ArchiveCategoryResponse> Handle(ArchiveCategoryRequest request)
+        {
+            // Get the existing category
+            var existingCategory = await _categoryRepository.GetCategoryByIdAsync(request.CategoryId);
+            if (existingCategory == null)
+            {
+                return new ArchiveCategoryResponse(null, false);
+            }
+
+            // Business logic: Archive the category by setting IsActive to false
+            existingCategory.IsActive = false;
+
+            // Archive all topics in this category
+            var topicsInCategory = await _topicRepository.GetTopicsByCategoryIdAsync(request.CategoryId);
+            foreach (var topic in topicsInCategory)
+            {
+                if (topic.IsActive)
+                {
+                    topic.IsActive = false;
+                    await _topicRepository.UpdateTopicAsync(topic);
+                }
+            }
+
+            // Save the category via repository
+            var archivedCategory = await _categoryRepository.UpdateCategoryAsync(existingCategory);
+            return new ArchiveCategoryResponse(archivedCategory, archivedCategory != null);
+        }
+    }
 }

@@ -8,6 +8,8 @@ namespace Contilog.Handlers.Categories
     public record GetCategoryByIdRequest(int CategoryId);
     
     public record UpdateCategoryRequest(int CategoryId, string Name);
+    
+    public record ArchiveCategoryRequest(int CategoryId);
 
     // Responses
     public record GetAllCategoriesResponse(IEnumerable<Category> Categories);
@@ -15,4 +17,6 @@ namespace Contilog.Handlers.Categories
     public record GetCategoryByIdResponse(Category? Category);
     
     public record UpdateCategoryResponse(Category? Category, bool Success);
+    
+    public record ArchiveCategoryResponse(Category? Category, bool Success);
 }

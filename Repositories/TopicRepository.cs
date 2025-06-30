@@ -30,6 +30,11 @@ namespace Contilog.Repositories
             return await Task.FromResult(_topics.FirstOrDefault(t => t.Id == id));
         }
 
+        public async Task<IEnumerable<Topic>> GetTopicsByCategoryIdAsync(int categoryId)
+        {
+            return await Task.FromResult(_topics.Where(t => t.CategoryId == categoryId));
+        }
+
         public Task<bool> DeleteTopicAsync(int id)
         {
             var topic = _topics.FirstOrDefault(t => t.Id == id);

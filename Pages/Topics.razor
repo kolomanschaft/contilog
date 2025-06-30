@@ -13,6 +13,7 @@
 @inject IDeleteTopicHandler DeleteTopicHandler
 @inject IGetAllCategoriesHandler GetAllCategoriesHandler
 @inject IUpdateCategoryHandler UpdateCategoryHandler
+@inject IArchiveCategoryHandler ArchiveCategoryHandler
 @inject IGetPostCountByTopicIdHandler GetPostCountByTopicIdHandler
 @inject NavigationManager Navigation
 
@@ -65,9 +66,14 @@ else
                             </h5>
                             @if (category.IsActive)
                             {
-                                <button class="btn btn-sm btn-outline-secondary" @onclick="() => StartEditingCategory(category.Id)" title="Edit Category Name">
-                                    <span class="oi oi-pencil" aria-hidden="true"></span>
-                                </button>
+                                <div class="d-flex gap-1">
+                                    <button class="btn btn-sm btn-primary" @onclick="() => StartEditingCategory(category.Id)" title="Edit Category Name">
+                                        <span class="oi oi-pencil" aria-hidden="true"></span>
+                                    </button>
+                                    <button class="btn btn-sm btn-warning" @onclick="() => ShowArchiveCategoryConfirmation(category.Id)" title="Archive Category">
+                                        <span class="oi oi-box" aria-hidden="true"></span>
+                                    </button>
+                                </div>
                             }
                         </div>
                     }
@@ -154,6 +160,16 @@ else
     OnConfirmed="ConfirmDeleteTopic"
     OnCancelled="HideDeleteConfirmation" />
 
+<ConfirmationDialog 
+    IsVisible="showArchiveCategoryConfirmation"
+    Title="Confirm Category Archive"
+    Message="Are you sure you want to archive this category and all its topics? They will be hidden from the active view but can be restored later."
+    ConfirmText="Archive"
+    CancelText="Cancel"
+    ConfirmButtonClass="btn-warning"
+    OnConfirmed="ConfirmArchiveCategory"
+    OnCancelled="HideArchiveCategoryConfirmation" />
+
 @code {
     private bool showArchived = false;
     private List<Topic>? topics = new();
@@ -173,6 +189,10 @@ else
     
     // Edit category
     private int? editingCategoryId = null;
+    
+    // Archive category confirmation
+    private bool showArchiveCategoryConfirmation = false;
+    private int categoryToArchiveId = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -412,6 +432,47 @@ else
                 // TODO: Show error message to user
                 Console.WriteLine("Failed to update category name");
             }
+        }
+    }
+    
+    // Category archive methods
+    private void ShowArchiveCategoryConfirmation(int categoryId)
+    {
+        categoryToArchiveId = categoryId;
+        showArchiveCategoryConfirmation = true;
+        StateHasChanged();
+    }
+
+    private void HideArchiveCategoryConfirmation()
+    {
+        showArchiveCategoryConfirmation = false;
+        categoryToArchiveId = 0;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmArchiveCategory()
+    {
+        showArchiveCategoryConfirmation = false;
+        if (categoryToArchiveId > 0)
+        {
+            await ArchiveCategory(categoryToArchiveId);
+        }
+        categoryToArchiveId = 0;
+        StateHasChanged();
+    }
+
+    private async Task ArchiveCategory(int categoryId)
+    {
+        var archiveCategoryRequest = new ArchiveCategoryRequest(categoryId);
+        var archiveCategoryResponse = await ArchiveCategoryHandler.Handle(archiveCategoryRequest);
+        if (archiveCategoryResponse.Success)
+        {
+            await LoadTopics(); // Reload categories and topics after archiving
+        }
+        else
+        {
+            // TODO: Show error message to user
+            Console.WriteLine($"Failed to archive category with ID: {categoryId}");
         }
     }
 }
