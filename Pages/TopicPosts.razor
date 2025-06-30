@@ -49,7 +49,7 @@ else
             <h3>Posts (@posts.Count())</h3>
         </div>
 
-        @if (!posts.Any() && topic.IsActive)
+        @if (!posts.Any() && !isAddingNewPost && topic.IsActive)
         {
             <div class="alert alert-info">
                 <h5>No posts yet</h5>

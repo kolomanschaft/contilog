@@ -39,5 +39,25 @@ namespace Contilog.Repositories
             _topics.Remove(topic);
             return Task.FromResult(true);
         }
+
+        public Task<Topic?> CreateTopicAsync(Topic topic)
+        {
+            // Generate new ID
+            var nextId = _topics.Any() ? _topics.Max(t => t.Id) + 1 : 1;
+            
+            var newTopic = new Topic
+            {
+                Id = nextId,
+                Title = topic.Title,
+                CategoryId = topic.CategoryId,
+                Author = topic.Author,
+                CreatedDate = DateTime.Now,
+                ModifiedDate = DateTime.Now,
+                IsActive = true
+            };
+            
+            _topics.Add(newTopic);
+            return Task.FromResult<Topic?>(newTopic);
+        }
     }
 }

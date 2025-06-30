@@ -92,3 +92,16 @@
 .topics-grid tbody tr.inactive-topic td {
     color: var(--text-muted);
 }
+
+/* Topic input styling */
+.topic-input {
+    max-width: 600px;
+}
+
+/* Add topic button icon alignment */
+.btn .oi-plus,
+.btn .oi-eye,
+.btn .oi-trash {
+    vertical-align: middle;
+    margin-top: -5px;
+}
