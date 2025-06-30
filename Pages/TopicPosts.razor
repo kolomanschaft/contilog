@@ -65,7 +65,8 @@ else
                               IsEditing="editingPostId == post.Id"
                               OnEditRequested="HandleEditRequested"
                               OnSaveRequested="HandleSaveRequested"
-                              OnCancelRequested="HandleCancelRequested" />
+                              OnCancelRequested="HandleCancelRequested"
+                              OnDeleteRequested="HandleDeleteRequested" />
                 }
                 
                 @if (isAddingNewPost)
@@ -154,7 +155,7 @@ else
                 Id = 0, // Will be assigned by repository
                 TopicId = TopicId,
                 Content = string.Empty,
-                Author = "Kylo Ren", // TODO: Get from authentication
+                Author = "Kylo Ren" // TODO: Get from authentication
             };
             
             isAddingNewPost = true;
@@ -234,5 +235,31 @@ else
         newPost = new Post();
         StateHasChanged();
         return Task.CompletedTask;
+    }
+    
+    private async Task HandleDeleteRequested(Post postToDelete)
+    {
+        if (postToDelete.Id > 0)
+        {
+            var success = await PostRepository.DeletePostAsync(postToDelete.Id);
+            if (success)
+            {
+                // Remove from local list
+                posts.RemoveAll(p => p.Id == postToDelete.Id);
+                
+                // Exit edit mode if this post was being edited
+                if (editingPostId == postToDelete.Id)
+                {
+                    editingPostId = null;
+                }
+                
+                StateHasChanged();
+            }
+            else
+            {
+                // TODO: Show error message to user
+                Console.WriteLine($"Failed to delete post with ID: {postToDelete.Id}");
+            }
+        }
     }
 }

@@ -89,5 +89,16 @@ namespace Contilog.Repositories
             _posts.Add(newPost);
             return Task.FromResult<Post?>(newPost);
         }
+
+        public Task<bool> DeletePostAsync(int id)
+        {
+            var postToDelete = _posts.FirstOrDefault(p => p.Id == id);
+            if (postToDelete != null)
+            {
+                _posts.Remove(postToDelete);
+                return Task.FromResult(true);
+            }
+            return Task.FromResult(false);
+        }
     }
 }

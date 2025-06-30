@@ -9,5 +9,6 @@ namespace Contilog.Repositories
         Task<int> GetPostCountByTopicIdAsync(int topicId);
         Task<Post?> UpdatePostAsync(Post post);
         Task<Post?> CreatePostAsync(Post post);
+        Task<bool> DeletePostAsync(int id);
     }
 }
