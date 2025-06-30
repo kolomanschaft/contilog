@@ -69,7 +69,7 @@ else
                                 <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => ViewPosts(context.Id)" title="View Posts">
                                     <span class="oi oi-eye" aria-hidden="true"></span>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteTopic(context.Id)" title="Delete Topic">
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteConfirmation(context.Id)" title="Delete Topic">
                                     <span class="oi oi-trash" aria-hidden="true"></span>
                                 </button>
                             </div>
@@ -81,11 +81,25 @@ else
     }
 }
 
+<ConfirmationDialog 
+    IsVisible="showDeleteConfirmation"
+    Title="Confirm Topic Deletion"
+    Message="Are you sure you want to delete this topic and all its posts? This action cannot be undone."
+    ConfirmText="Delete"
+    CancelText="Cancel"
+    ConfirmButtonClass="btn-danger"
+    OnConfirmed="ConfirmDeleteTopic"
+    OnCancelled="HideDeleteConfirmation" />
+
 @code {
     private bool showArchived = false;
     private List<Topic>? topics = new();
     private List<Category>? categories = new();
     private Dictionary<int, int> postCounts = new();
+    
+    // Delete confirmation
+    private bool showDeleteConfirmation = false;
+    private int topicToDeleteId = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -145,6 +159,31 @@ else
     private int GetPostCount(int topicId)
     {
         return postCounts.TryGetValue(topicId, out var count) ? count : 0;
+    }
+
+    private void ShowDeleteConfirmation(int topicId)
+    {
+        topicToDeleteId = topicId;
+        showDeleteConfirmation = true;
+        StateHasChanged();
+    }
+
+    private void HideDeleteConfirmation()
+    {
+        showDeleteConfirmation = false;
+        topicToDeleteId = 0;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmDeleteTopic()
+    {
+        showDeleteConfirmation = false;
+        if (topicToDeleteId > 0)
+        {
+            await DeleteTopic(topicToDeleteId);
+        }
+        topicToDeleteId = 0;
+        StateHasChanged();
     }
 
     private async Task DeleteTopic(int topicId)
