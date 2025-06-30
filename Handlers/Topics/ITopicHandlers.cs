@@ -12,6 +12,10 @@ namespace Contilog.Handlers.Topics
     {
     }
 
+    public interface IArchiveTopicHandler : IHandler<ArchiveTopicRequest, ArchiveTopicResponse>
+    {
+    }
+
     public interface IDeleteTopicHandler : IHandler<DeleteTopicRequest, DeleteTopicResponse>
     {
     }

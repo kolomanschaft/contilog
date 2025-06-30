@@ -77,6 +77,40 @@ namespace Contilog.Handlers.Topics
         }
     }
 
+    public class ArchiveTopicHandler : IArchiveTopicHandler
+    {
+        private readonly ITopicRepository _topicRepository;
+
+        public ArchiveTopicHandler(ITopicRepository topicRepository)
+        {
+            _topicRepository = topicRepository;
+        }
+
+        public async Task<ArchiveTopicResponse> Handle(ArchiveTopicRequest request)
+        {
+            // Business logic: Get the topic first
+            var topic = await _topicRepository.GetTopicByIdAsync(request.TopicId);
+            if (topic == null)
+            {
+                return new ArchiveTopicResponse(null, false);
+            }
+
+            // Only allow archiving of active topics
+            if (!topic.IsActive)
+            {
+                return new ArchiveTopicResponse(null, false);
+            }
+
+            // Archive the topic by setting IsActive to false
+            topic.IsActive = false;
+            topic.ModifiedDate = DateTime.UtcNow;
+
+            // Update via repository (assuming we have an update method, or we'll need to add one)
+            var updatedTopic = await _topicRepository.UpdateTopicAsync(topic);
+            return new ArchiveTopicResponse(updatedTopic, updatedTopic != null);
+        }
+    }
+
     public class DeleteTopicHandler : IDeleteTopicHandler
     {
         private readonly ITopicRepository _topicRepository;
@@ -90,7 +124,20 @@ namespace Contilog.Handlers.Topics
 
         public async Task<DeleteTopicResponse> Handle(DeleteTopicRequest request)
         {
-            // Business logic: Delete all posts associated with the topic first
+            // Business logic: Get the topic first to check if it's archived
+            var topic = await _topicRepository.GetTopicByIdAsync(request.TopicId);
+            if (topic == null)
+            {
+                return new DeleteTopicResponse(false);
+            }
+
+            // Only allow deletion of archived topics
+            if (topic.IsActive)
+            {
+                return new DeleteTopicResponse(false);
+            }
+
+            // Delete all posts associated with the topic first
             var posts = await _postRepository.GetPostsByTopicIdAsync(request.TopicId);
             foreach (var post in posts)
             {

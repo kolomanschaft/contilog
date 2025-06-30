@@ -9,6 +9,7 @@
 @inject IGetAllTopicsHandler GetAllTopicsHandler
 @inject IGetTopicByIdHandler GetTopicByIdHandler
 @inject ICreateTopicHandler CreateTopicHandler
+@inject IArchiveTopicHandler ArchiveTopicHandler
 @inject IDeleteTopicHandler DeleteTopicHandler
 @inject IGetAllCategoriesHandler GetAllCategoriesHandler
 @inject IGetPostCountByTopicIdHandler GetPostCountByTopicIdHandler
@@ -75,9 +76,18 @@ else
                                 <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => ViewPosts(context.Id)" title="View Posts">
                                     <span class="oi oi-eye" aria-hidden="true"></span>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteConfirmation(context.Id)" title="Delete Topic">
-                                    <span class="oi oi-trash" aria-hidden="true"></span>
-                                </button>
+                                @if (context.IsActive)
+                                {
+                                    <button class="btn btn-sm btn-outline-warning" @onclick="() => ShowArchiveConfirmation(context.Id)" title="Archive Topic">
+                                        <span class="oi oi-box" aria-hidden="true"></span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteConfirmation(context.Id)" title="Delete Topic">
+                                        <span class="oi oi-trash" aria-hidden="true"></span>
+                                    </button>
+                                }
                             </div>
                         </TemplateColumn>
                     </QuickGrid>
@@ -112,6 +122,16 @@ else
 }
 
 <ConfirmationDialog 
+    IsVisible="showArchiveConfirmation"
+    Title="Confirm Topic Archive"
+    Message="Are you sure you want to archive this topic? It will be hidden from the active view but can be restored later."
+    ConfirmText="Archive"
+    CancelText="Cancel"
+    ConfirmButtonClass="btn-warning"
+    OnConfirmed="ConfirmArchiveTopic"
+    OnCancelled="HideArchiveConfirmation" />
+
+<ConfirmationDialog 
     IsVisible="showDeleteConfirmation"
     Title="Confirm Topic Deletion"
     Message="Are you sure you want to delete this topic and all its posts? This action cannot be undone."
@@ -126,6 +146,10 @@ else
     private List<Topic>? topics = new();
     private List<Category>? categories = new();
     private Dictionary<int, int> postCounts = new();
+    
+    // Archive confirmation
+    private bool showArchiveConfirmation = false;
+    private int topicToArchiveId = 0;
     
     // Delete confirmation
     private bool showDeleteConfirmation = false;
@@ -201,6 +225,31 @@ else
         return postCounts.TryGetValue(topicId, out var count) ? count : 0;
     }
 
+    private void ShowArchiveConfirmation(int topicId)
+    {
+        topicToArchiveId = topicId;
+        showArchiveConfirmation = true;
+        StateHasChanged();
+    }
+
+    private void HideArchiveConfirmation()
+    {
+        showArchiveConfirmation = false;
+        topicToArchiveId = 0;
+        StateHasChanged();
+    }
+
+    private async Task ConfirmArchiveTopic()
+    {
+        showArchiveConfirmation = false;
+        if (topicToArchiveId > 0)
+        {
+            await ArchiveTopic(topicToArchiveId);
+        }
+        topicToArchiveId = 0;
+        StateHasChanged();
+    }
+
     private void ShowDeleteConfirmation(int topicId)
     {
         topicToDeleteId = topicId;
@@ -224,6 +273,21 @@ else
         }
         topicToDeleteId = 0;
         StateHasChanged();
+    }
+
+    private async Task ArchiveTopic(int topicId)
+    {
+        var archiveTopicRequest = new ArchiveTopicRequest(topicId);
+        var archiveTopicResponse = await ArchiveTopicHandler.Handle(archiveTopicRequest);
+        if (archiveTopicResponse.Success)
+        {
+            await LoadTopics(); // Reload topics after archiving
+        }
+        else
+        {
+            // TODO: Show error message to user
+            Console.WriteLine($"Failed to archive topic with ID: {topicId}");
+        }
     }
 
     private async Task DeleteTopic(int topicId)

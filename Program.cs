@@ -20,6 +20,7 @@ builder.Services.AddSingleton<IPostRepository, PostRepository>();
 builder.Services.AddScoped<IGetAllTopicsHandler, GetAllTopicsHandler>();
 builder.Services.AddScoped<IGetTopicByIdHandler, GetTopicByIdHandler>();
 builder.Services.AddScoped<ICreateTopicHandler, CreateTopicHandler>();
+builder.Services.AddScoped<IArchiveTopicHandler, ArchiveTopicHandler>();
 builder.Services.AddScoped<IDeleteTopicHandler, DeleteTopicHandler>();
 
 // Register category handlers

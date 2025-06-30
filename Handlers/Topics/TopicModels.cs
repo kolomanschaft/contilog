@@ -9,6 +9,8 @@ namespace Contilog.Handlers.Topics
     
     public record CreateTopicRequest(string Title, int CategoryId, string Author);
     
+    public record ArchiveTopicRequest(int TopicId);
+    
     public record DeleteTopicRequest(int TopicId);
 
     // Responses
@@ -17,6 +19,8 @@ namespace Contilog.Handlers.Topics
     public record GetTopicByIdResponse(Topic? Topic);
     
     public record CreateTopicResponse(Topic? Topic, bool Success);
+    
+    public record ArchiveTopicResponse(Topic? Topic, bool Success);
     
     public record DeleteTopicResponse(bool Success);
 }

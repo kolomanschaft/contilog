@@ -59,5 +59,23 @@ namespace Contilog.Repositories
             _topics.Add(newTopic);
             return Task.FromResult<Topic?>(newTopic);
         }
+
+        public Task<Topic?> UpdateTopicAsync(Topic topic)
+        {
+            var existingTopic = _topics.FirstOrDefault(t => t.Id == topic.Id);
+            if (existingTopic == null)
+            {
+                return Task.FromResult<Topic?>(null);
+            }
+
+            // Update the existing topic
+            existingTopic.Title = topic.Title;
+            existingTopic.CategoryId = topic.CategoryId;
+            existingTopic.Author = topic.Author;
+            existingTopic.IsActive = topic.IsActive;
+            existingTopic.ModifiedDate = DateTime.Now;
+
+            return Task.FromResult<Topic?>(existingTopic);
+        }
     }
 }
