@@ -13,9 +13,9 @@
 <div class="topics-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Topics</h1>
-        <button class="btn @(archiveMode ? "btn-outline-primary" : "btn-primary")" @onclick="ToggleArchiveMode">
-            <span class="oi @(archiveMode ? "oi-arrow-left" : "oi-box")" aria-hidden="true"></span>
-            @(archiveMode ? "Back" : "Archive")
+        <button class="btn btn-outline-secondary" @onclick="ToggleArchiveVisibility">
+            <span class="oi @(showArchived ? "oi-eye-closed" : "oi-eye")" aria-hidden="true"></span>
+            @(showArchived ? "Hide archived" : "Show archived")
         </button>
     </div>
 </div>
@@ -30,18 +30,28 @@
 }
 else
 {
-    @foreach (var category in categories)
+    @foreach (var category in GetVisibleCategories())
     {
         <div class="category-container">
             <div class="card topics-card">
                 <div class="card-header topics-card-header">
-                    <h5 class="card-title topics-card-title">@category.Name</h5>
+                    <h5 class="card-title topics-card-title @(category.IsActive ? "" : "text-muted")">
+                        @category.Name
+                        @if (!category.IsActive)
+                        {
+                            <span class="badge bg-secondary ms-2">Archived</span>
+                        }
+                    </h5>
                 </div>
                 <div class="card-body topics-card-body">
                     <QuickGrid Items="@GetTopicsByCategory(category)" Class="table topics-table topics-grid">
                         <TemplateColumn Title="Topics" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Title))">
                             <div class="@(context.IsActive ? "" : "text-muted")">
                                 @context.Title
+                                @if (!context.IsActive)
+                                {
+                                    <span class="badge bg-secondary ms-2">Archived</span>
+                                }
                             </div>
                         </TemplateColumn>
                         <TemplateColumn Title="Author" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Author))">
@@ -72,7 +82,7 @@ else
 }
 
 @code {
-    private bool archiveMode = false;
+    private bool showArchived = false;
     private List<Topic>? topics = new();
     private List<Category>? categories = new();
     private Dictionary<int, int> postCounts = new();
@@ -101,12 +111,35 @@ else
     {
         if (topics == null) return new List<Topic>().AsQueryable();
 
-        return topics
-            .Where(t => t.CategoryId == category.Id)
-            .Where(t => t.IsActive != archiveMode)
-            .OrderByDescending(t => t.IsActive)
+        var filteredTopics = topics.Where(t => t.CategoryId == category.Id);
+        
+        if (!showArchived)
+        {
+            // Only show active topics when showArchived is false
+            filteredTopics = filteredTopics.Where(t => t.IsActive);
+        }
+        // When showArchived is true, show both active and archived topics
+        
+        return filteredTopics
+            .OrderByDescending(t => t.IsActive) // Active topics first
             .ThenByDescending(t => t.CreatedDate)
             .AsQueryable();
+    }
+
+    // Filter categories based on archive visibility
+    private IEnumerable<Category> GetVisibleCategories()
+    {
+        if (categories == null) return new List<Category>();
+
+        var filteredCategories = categories.AsEnumerable();
+        
+        if (!showArchived)
+        {
+            // Only show active categories when showArchived is false
+            filteredCategories = categories.Where(c => c.IsActive);
+        }
+        // When showArchived is true, show both active and archived categories
+        return filteredCategories.OrderBy(c => c.Name);
     }
 
     private int GetPostCount(int topicId)
@@ -133,9 +166,10 @@ else
         Navigation.NavigateTo($"/topics/{topicId}");
     }
 
-    private void ToggleArchiveMode()
+    private void ToggleArchiveVisibility()
     {
-        archiveMode = !archiveMode;
+        showArchived = !showArchived;
+        StateHasChanged();
     }
 }
 

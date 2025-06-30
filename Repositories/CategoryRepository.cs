@@ -15,7 +15,7 @@ namespace Contilog.Repositories
                 new Category { Id = 3, Name = "Database", Description = "Database design, optimization, and management", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
                 new Category { Id = 4, Name = "Frontend", Description = "Client-side development and user interfaces", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
                 new Category { Id = 5, Name = "DevOps", Description = "Development operations and deployment", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
-                new Category { Id = 6, Name = "Quality Assurance", Description = "Testing strategies and quality control", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true }
+                new Category { Id = 6, Name = "Quality Assurance", Description = "Testing strategies and quality control", CreatedDate = DateTime.Now.AddDays(-100), IsActive = false }
             };
         }
 
