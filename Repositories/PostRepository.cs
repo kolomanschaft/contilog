@@ -70,5 +70,24 @@ namespace Contilog.Repositories
             }
             return Task.FromResult<Post?>(null);
         }
+
+        public Task<Post?> CreatePostAsync(Post post)
+        {
+            // Generate new ID
+            var nextId = _posts.Any() ? _posts.Max(p => p.Id) + 1 : 1;
+            
+            var newPost = new Post
+            {
+                Id = nextId,
+                TopicId = post.TopicId,
+                Content = post.Content,
+                Author = post.Author,
+                CreatedDate = DateTime.Now,
+                ModifiedDate = DateTime.Now
+            };
+            
+            _posts.Add(newPost);
+            return Task.FromResult<Post?>(newPost);
+        }
     }
 }

@@ -67,6 +67,15 @@ else
                               OnSaveRequested="HandleSaveRequested"
                               OnCancelRequested="HandleCancelRequested" />
                 }
+                
+                @if (isAddingNewPost)
+                {
+                    <PostCard Post="newPost" 
+                              IsEditing="true"
+                              OnEditRequested="HandleEditRequested"
+                              OnSaveRequested="HandleNewPostSaveRequested"
+                              OnCancelRequested="HandleNewPostCancelRequested" />
+                }
             </div>
         }
 
@@ -93,6 +102,10 @@ else
     
     // Edit mode properties
     private int? editingPostId = null;
+    
+    // Add new post properties
+    private bool isAddingNewPost = false;
+    private Post newPost = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -133,8 +146,21 @@ else
 
     private void AddNewPost()
     {
-        // TODO: Implement add new post functionality
-        Console.WriteLine("Add new post clicked");
+        if (topic != null)
+        {
+            // Create a new empty post for editing
+            newPost = new Post
+            {
+                Id = 0, // Will be assigned by repository
+                TopicId = TopicId,
+                Content = string.Empty,
+                Author = "Kylo Ren", // TODO: Get from authentication
+            };
+            
+            isAddingNewPost = true;
+            editingPostId = null; // Cancel any existing edits
+            StateHasChanged();
+        }
     }
 
     private Task HandleEditRequested(Post post)
@@ -174,6 +200,38 @@ else
     private Task HandleCancelRequested()
     {
         editingPostId = null;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+    
+    private async Task HandleNewPostSaveRequested(Post newPostData)
+    {
+        if (topic != null && !string.IsNullOrWhiteSpace(newPostData.Content))
+        {
+            // Create the post in the repository
+            var createdPost = await PostRepository.CreatePostAsync(newPostData);
+            if (createdPost != null)
+            {
+                // Add to local list
+                posts.Add(createdPost);
+                
+                // Exit add mode
+                isAddingNewPost = false;
+                newPost = new Post();
+                StateHasChanged();
+            }
+            else
+            {
+                // TODO: Show error message to user
+                Console.WriteLine("Failed to create new post");
+            }
+        }
+    }
+    
+    private Task HandleNewPostCancelRequested()
+    {
+        isAddingNewPost = false;
+        newPost = new Post();
         StateHasChanged();
         return Task.CompletedTask;
     }

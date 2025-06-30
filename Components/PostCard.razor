@@ -50,7 +50,10 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="text-muted small">
                         <div><strong>Author:</strong> @Post.Author</div>
-                        <div><strong>Created:</strong> @Post.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")</div>
+                        @if (Post.CreatedDate > DateTime.MinValue)
+                        {
+                            <div><strong>Created:</strong> @Post.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")</div>
+                        }
                     </div>
                     <div class="btn-group">
                         <button type="submit" class="btn btn-success btn-sm">
@@ -81,11 +84,14 @@
                     <div class="post-author">
                         <strong>@Post.Author</strong>
                     </div>
-                    <div class="post-date">
-                        <b>Created: </b>
-                        @Post.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
-                    </div>
-                    @if (!Post.ModifiedDate.Equals(Post.CreatedDate))
+                    @if (Post.CreatedDate > DateTime.MinValue)
+                    {
+                        <div class="post-date">
+                            <b>Created: </b>
+                            @Post.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
+                        </div>
+                    }
+                    @if (Post.ModifiedDate > DateTime.MinValue && !Post.ModifiedDate.Equals(Post.CreatedDate))
                     {
                         <div class="post-date">
                             <b>Last modified: </b>
