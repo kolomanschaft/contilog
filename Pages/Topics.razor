@@ -1,12 +1,17 @@
 @page "/topics"
 @using Contilog.Models
-@using Contilog.Repositories
+@using Contilog.Handlers.Topics
+@using Contilog.Handlers.Categories
+@using Contilog.Handlers.Posts
 @using System.Linq
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.AspNetCore.Components.Web
-@inject ITopicRepository TopicRepository
-@inject IPostRepository PostRepository
-@inject ICategoryRepository CategoryRepository
+@inject IGetAllTopicsHandler GetAllTopicsHandler
+@inject IGetTopicByIdHandler GetTopicByIdHandler
+@inject ICreateTopicHandler CreateTopicHandler
+@inject IDeleteTopicHandler DeleteTopicHandler
+@inject IGetAllCategoriesHandler GetAllCategoriesHandler
+@inject IGetPostCountByTopicIdHandler GetPostCountByTopicIdHandler
 @inject NavigationManager Navigation
 
 <PageTitle>Topics</PageTitle>
@@ -137,13 +142,19 @@ else
 
     private async Task LoadTopicsAsync()
     {
-        categories = (await CategoryRepository.GetAllCategoriesAsync()).ToList();
-        topics = (await TopicRepository.GetAllTopicsAsync()).ToList();
+        var getAllCategoriesRequest = new GetAllCategoriesRequest();
+        var getAllCategoriesResponse = await GetAllCategoriesHandler.HandleAsync(getAllCategoriesRequest);
+        categories = getAllCategoriesResponse.Categories.ToList();
+        
+        var getAllTopicsRequest = new GetAllTopicsRequest();
+        var getAllTopicsResponse = await GetAllTopicsHandler.HandleAsync(getAllTopicsRequest);
+        topics = getAllTopicsResponse.Topics.ToList();
         postCounts.Clear();
         foreach (var topic in topics)
         {
-            var count = await PostRepository.GetPostCountByTopicIdAsync(topic.Id);
-            postCounts[topic.Id] = count;
+            var getPostCountRequest = new GetPostCountByTopicIdRequest(topic.Id);
+            var getPostCountResponse = await GetPostCountByTopicIdHandler.HandleAsync(getPostCountRequest);
+            postCounts[topic.Id] = getPostCountResponse.Count;
         }
 
         StateHasChanged();
@@ -217,8 +228,9 @@ else
 
     private async Task DeleteTopic(int topicId)
     {
-        var success = await TopicRepository.DeleteTopicAsync(topicId);
-        if (success)
+        var deleteTopicRequest = new DeleteTopicRequest(topicId);
+        var deleteTopicResponse = await DeleteTopicHandler.HandleAsync(deleteTopicRequest);
+        if (deleteTopicResponse.Success)
         {
             await LoadTopicsAsync(); // Reload topics after deletion
         }
@@ -258,21 +270,20 @@ else
     {
         if (!string.IsNullOrWhiteSpace(newTopicTitle))
         {
-            var newTopic = new Topic
-            {
-                Title = newTopicTitle.Trim(),
-                CategoryId = categoryId,
-                Author = "Kylo Ren" // TODO: Get from authentication
-            };
+            var createTopicRequest = new CreateTopicRequest(
+                newTopicTitle.Trim(),
+                categoryId,
+                "Kylo Ren" // TODO: Get from authentication
+            );
 
-            var createdTopic = await TopicRepository.CreateTopicAsync(newTopic);
-            if (createdTopic != null)
+            var createTopicResponse = await CreateTopicHandler.HandleAsync(createTopicRequest);
+            if (createTopicResponse.Success && createTopicResponse.Topic != null)
             {
                 // Add to local list
-                topics?.Add(createdTopic);
+                topics?.Add(createTopicResponse.Topic);
                 
                 // Initialize post count for new topic
-                postCounts[createdTopic.Id] = 0;
+                postCounts[createTopicResponse.Topic.Id] = 0;
                 
                 // Exit add mode
                 addingTopicToCategoryId = null;
