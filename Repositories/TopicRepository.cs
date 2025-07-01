@@ -20,22 +20,22 @@ namespace Contilog.Repositories
             };
         }
 
-        public async Task<IEnumerable<Topic>> GetAllTopicsAsync()
+        public async Task<IEnumerable<Topic>> GetAllTopics()
         {
             return await Task.FromResult(_topics);
         }
 
-        public async Task<Topic?> GetTopicByIdAsync(int id)
+        public async Task<Topic?> GetTopicById(int id)
         {
             return await Task.FromResult(_topics.FirstOrDefault(t => t.Id == id));
         }
 
-        public async Task<IEnumerable<Topic>> GetTopicsByCategoryIdAsync(int categoryId)
+        public async Task<IEnumerable<Topic>> GetTopicsByCategoryId(int categoryId)
         {
             return await Task.FromResult(_topics.Where(t => t.CategoryId == categoryId));
         }
 
-        public Task<bool> DeleteTopicAsync(int id)
+        public Task<bool> DeleteTopic(int id)
         {
             var topic = _topics.FirstOrDefault(t => t.Id == id);
             if (topic == null)
@@ -45,7 +45,7 @@ namespace Contilog.Repositories
             return Task.FromResult(true);
         }
 
-        public Task<Topic?> CreateTopicAsync(Topic topic)
+        public Task<Topic?> CreateTopic(Topic topic)
         {
             // Generate new ID
             var nextId = _topics.Any() ? _topics.Max(t => t.Id) + 1 : 1;
@@ -65,7 +65,7 @@ namespace Contilog.Repositories
             return Task.FromResult<Topic?>(newTopic);
         }
 
-        public Task<Topic?> UpdateTopicAsync(Topic topic)
+        public Task<Topic?> UpdateTopic(Topic topic)
         {
             var existingTopic = _topics.FirstOrDefault(t => t.Id == topic.Id);
             if (existingTopic == null)

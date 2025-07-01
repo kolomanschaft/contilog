@@ -4,11 +4,11 @@ namespace Contilog.Repositories
 {
     public interface IPostRepository
     {
-        Task<IEnumerable<Post>> GetPostsByTopicIdAsync(int topicId);
-        Task<Post?> GetPostByIdAsync(int id);
-        Task<int> GetPostCountByTopicIdAsync(int topicId);
-        Task<Post?> UpdatePostAsync(Post post);
-        Task<Post?> CreatePostAsync(Post post);
-        Task<bool> DeletePostAsync(int id);
+        Task<IEnumerable<Post>> GetPostsByTopicId(int topicId);
+        Task<Post?> GetPostById(int id);
+        Task<int> GetPostCountByTopicId(int topicId);
+        Task<Post?> UpdatePost(Post post);
+        Task<Post?> CreatePost(Post post);
+        Task<bool> DeletePost(int id);
     }
 }

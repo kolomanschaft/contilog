@@ -14,7 +14,7 @@ namespace Contilog.Handlers.Categories
 
         public async Task<GetAllCategoriesResponse> Handle(GetAllCategoriesRequest request)
         {
-            var categories = await _categoryRepository.GetAllCategoriesAsync();
+            var categories = await _categoryRepository.GetAllCategories();
             return new GetAllCategoriesResponse(categories);
         }
     }
@@ -40,13 +40,12 @@ namespace Contilog.Handlers.Categories
             var newCategory = new Category
             {
                 Name = request.Name.Trim(),
-                Description = "", // Default empty description
                 IsActive = true,
                 CreatedDate = DateTime.Now
             };
 
             // Save via repository
-            var createdCategory = await _categoryRepository.CreateCategoryAsync(newCategory);
+            var createdCategory = await _categoryRepository.CreateCategory(newCategory);
             return new CreateCategoryResponse(createdCategory, createdCategory != null);
         }
     }
@@ -69,7 +68,7 @@ namespace Contilog.Handlers.Categories
             }
 
             // Get the existing category
-            var existingCategory = await _categoryRepository.GetCategoryByIdAsync(request.CategoryId);
+            var existingCategory = await _categoryRepository.GetCategoryById(request.CategoryId);
             if (existingCategory == null)
             {
                 return new UpdateCategoryResponse(null, false);
@@ -79,7 +78,7 @@ namespace Contilog.Handlers.Categories
             existingCategory.Name = request.Name.Trim();
 
             // Save via repository
-            var updatedCategory = await _categoryRepository.UpdateCategoryAsync(existingCategory);
+            var updatedCategory = await _categoryRepository.UpdateCategory(existingCategory);
             return new UpdateCategoryResponse(updatedCategory, updatedCategory != null);
         }
     }
@@ -98,7 +97,7 @@ namespace Contilog.Handlers.Categories
         public async Task<ArchiveCategoryResponse> Handle(ArchiveCategoryRequest request)
         {
             // Get the existing category
-            var existingCategory = await _categoryRepository.GetCategoryByIdAsync(request.CategoryId);
+            var existingCategory = await _categoryRepository.GetCategoryById(request.CategoryId);
             if (existingCategory == null)
             {
                 return new ArchiveCategoryResponse(null, false);
@@ -108,18 +107,18 @@ namespace Contilog.Handlers.Categories
             existingCategory.IsActive = false;
 
             // Archive all topics in this category
-            var topicsInCategory = await _topicRepository.GetTopicsByCategoryIdAsync(request.CategoryId);
+            var topicsInCategory = await _topicRepository.GetTopicsByCategoryId(request.CategoryId);
             foreach (var topic in topicsInCategory)
             {
                 if (topic.IsActive)
                 {
                     topic.IsActive = false;
-                    await _topicRepository.UpdateTopicAsync(topic);
+                    await _topicRepository.UpdateTopic(topic);
                 }
             }
 
             // Save the category via repository
-            var archivedCategory = await _categoryRepository.UpdateCategoryAsync(existingCategory);
+            var archivedCategory = await _categoryRepository.UpdateCategory(existingCategory);
             return new ArchiveCategoryResponse(archivedCategory, archivedCategory != null);
         }
     }

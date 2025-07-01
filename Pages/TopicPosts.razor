@@ -121,13 +121,13 @@ else
 
     private async Task LoadTopicData()
     {
-        topic = await TopicRepository.GetTopicByIdAsync(TopicId);
+        topic = await TopicRepository.GetTopicById(TopicId);
         if (topic != null)
         {
             topicTitle = topic.Title;
-            var topicPosts = await PostRepository.GetPostsByTopicIdAsync(TopicId);
+            var topicPosts = await PostRepository.GetPostsByTopicId(TopicId);
             posts = topicPosts.ToList();
-            category = await CategoryRepository.GetCategoryByIdAsync(topic.CategoryId);
+            category = await CategoryRepository.GetCategoryById(topic.CategoryId);
             if (category != null)
             {
                 categoryName = category.Name;
@@ -177,7 +177,7 @@ else
         if (editingPostId.HasValue)
         {
             // Update the post in the repository
-            var  updatedPost = await PostRepository.UpdatePostAsync(editedPost);
+            var  updatedPost = await PostRepository.UpdatePost(editedPost);
             if (updatedPost != null)
             {
                 // Update the local list
@@ -211,7 +211,7 @@ else
         if (topic != null && !string.IsNullOrWhiteSpace(newPostData.Content))
         {
             // Create the post in the repository
-            var createdPost = await PostRepository.CreatePostAsync(newPostData);
+            var createdPost = await PostRepository.CreatePost(newPostData);
             if (createdPost != null)
             {
                 // Add to local list
@@ -242,7 +242,7 @@ else
     {
         if (postToDelete.Id > 0)
         {
-            var success = await PostRepository.DeletePostAsync(postToDelete.Id);
+            var success = await PostRepository.DeletePost(postToDelete.Id);
             if (success)
             {
                 // Remove from local list

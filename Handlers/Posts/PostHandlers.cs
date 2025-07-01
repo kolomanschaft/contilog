@@ -14,7 +14,7 @@ namespace Contilog.Handlers.Posts
 
         public async Task<GetPostsByTopicIdResponse> Handle(GetPostsByTopicIdRequest request)
         {
-            var posts = await _postRepository.GetPostsByTopicIdAsync(request.TopicId);
+            var posts = await _postRepository.GetPostsByTopicId(request.TopicId);
             return new GetPostsByTopicIdResponse(posts);
         }
     }
@@ -30,7 +30,7 @@ namespace Contilog.Handlers.Posts
 
         public async Task<GetPostByIdResponse> Handle(GetPostByIdRequest request)
         {
-            var post = await _postRepository.GetPostByIdAsync(request.PostId);
+            var post = await _postRepository.GetPostById(request.PostId);
             return new GetPostByIdResponse(post);
         }
     }
@@ -46,7 +46,7 @@ namespace Contilog.Handlers.Posts
 
         public async Task<GetPostCountByTopicIdResponse> Handle(GetPostCountByTopicIdRequest request)
         {
-            var count = await _postRepository.GetPostCountByTopicIdAsync(request.TopicId);
+            var count = await _postRepository.GetPostCountByTopicId(request.TopicId);
             return new GetPostCountByTopicIdResponse(count);
         }
     }
@@ -71,7 +71,7 @@ namespace Contilog.Handlers.Posts
             }
 
             // Validate that the topic exists
-            var topic = await _topicRepository.GetTopicByIdAsync(request.TopicId);
+            var topic = await _topicRepository.GetTopicById(request.TopicId);
             if (topic == null)
             {
                 return new CreatePostResponse(null, false);
@@ -87,7 +87,7 @@ namespace Contilog.Handlers.Posts
             };
 
             // Save via repository
-            var createdPost = await _postRepository.CreatePostAsync(post);
+            var createdPost = await _postRepository.CreatePost(post);
             return new CreatePostResponse(createdPost, createdPost != null);
         }
     }
@@ -110,7 +110,7 @@ namespace Contilog.Handlers.Posts
             }
 
             // Get the existing post
-            var existingPost = await _postRepository.GetPostByIdAsync(request.PostId);
+            var existingPost = await _postRepository.GetPostById(request.PostId);
             if (existingPost == null)
             {
                 return new UpdatePostResponse(null, false);
@@ -121,7 +121,7 @@ namespace Contilog.Handlers.Posts
             existingPost.ModifiedDate = DateTime.UtcNow;
 
             // Save via repository
-            var updatedPost = await _postRepository.UpdatePostAsync(existingPost);
+            var updatedPost = await _postRepository.UpdatePost(existingPost);
             return new UpdatePostResponse(updatedPost, updatedPost != null);
         }
     }
@@ -138,7 +138,7 @@ namespace Contilog.Handlers.Posts
         public async Task<DeletePostResponse> Handle(DeletePostRequest request)
         {
             // Business logic: could add validation here (e.g., check permissions, soft delete, etc.)
-            var success = await _postRepository.DeletePostAsync(request.PostId);
+            var success = await _postRepository.DeletePost(request.PostId);
             return new DeletePostResponse(success);
         }
     }

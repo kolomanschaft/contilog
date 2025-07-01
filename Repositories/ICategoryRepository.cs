@@ -4,9 +4,9 @@ namespace Contilog.Repositories
 {
     public interface ICategoryRepository
     {
-        Task<IEnumerable<Category>> GetAllCategoriesAsync();
-        Task<Category?> GetCategoryByIdAsync(int id);
-        Task<Category?> CreateCategoryAsync(Category category);
-        Task<Category?> UpdateCategoryAsync(Category category);
+        Task<IEnumerable<Category>> GetAllCategories();
+        Task<Category?> GetCategoryById(int id);
+        Task<Category?> CreateCategory(Category category);
+        Task<Category?> UpdateCategory(Category category);
     }
 }

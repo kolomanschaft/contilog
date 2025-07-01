@@ -4,11 +4,11 @@ namespace Contilog.Repositories
 {
     public interface ITopicRepository
     {
-        Task<IEnumerable<Topic>> GetAllTopicsAsync();
-        Task<Topic?> GetTopicByIdAsync(int id);
-        Task<IEnumerable<Topic>> GetTopicsByCategoryIdAsync(int categoryId);
-        Task<bool> DeleteTopicAsync(int id);
-        Task<Topic?> CreateTopicAsync(Topic topic);
-        Task<Topic?> UpdateTopicAsync(Topic topic);
+        Task<IEnumerable<Topic>> GetAllTopics();
+        Task<Topic?> GetTopicById(int id);
+        Task<IEnumerable<Topic>> GetTopicsByCategoryId(int categoryId);
+        Task<bool> DeleteTopic(int id);
+        Task<Topic?> CreateTopic(Topic topic);
+        Task<Topic?> UpdateTopic(Topic topic);
     }
 }

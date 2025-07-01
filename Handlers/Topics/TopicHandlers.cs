@@ -14,7 +14,7 @@ namespace Contilog.Handlers.Topics
 
         public async Task<GetAllTopicsResponse> Handle(GetAllTopicsRequest request)
         {
-            var topics = await _topicRepository.GetAllTopicsAsync();
+            var topics = await _topicRepository.GetAllTopics();
             return new GetAllTopicsResponse(topics);
         }
     }
@@ -39,7 +39,7 @@ namespace Contilog.Handlers.Topics
             }
 
             // Validate that the category exists
-            var category = await _categoryRepository.GetCategoryByIdAsync(request.CategoryId);
+            var category = await _categoryRepository.GetCategoryById(request.CategoryId);
             if (category == null)
             {
                 return new CreateTopicResponse(null, false);
@@ -56,7 +56,7 @@ namespace Contilog.Handlers.Topics
             };
 
             // Save via repository
-            var createdTopic = await _topicRepository.CreateTopicAsync(topic);
+            var createdTopic = await _topicRepository.CreateTopic(topic);
             return new CreateTopicResponse(createdTopic, createdTopic != null);
         }
     }
@@ -73,7 +73,7 @@ namespace Contilog.Handlers.Topics
         public async Task<ArchiveTopicResponse> Handle(ArchiveTopicRequest request)
         {
             // Business logic: Get the topic first
-            var topic = await _topicRepository.GetTopicByIdAsync(request.TopicId);
+            var topic = await _topicRepository.GetTopicById(request.TopicId);
             if (topic == null)
             {
                 return new ArchiveTopicResponse(null, false);
@@ -90,7 +90,7 @@ namespace Contilog.Handlers.Topics
             topic.ModifiedDate = DateTime.UtcNow;
 
             // Update via repository (assuming we have an update method, or we'll need to add one)
-            var updatedTopic = await _topicRepository.UpdateTopicAsync(topic);
+            var updatedTopic = await _topicRepository.UpdateTopic(topic);
             return new ArchiveTopicResponse(updatedTopic, updatedTopic != null);
         }
     }
@@ -109,7 +109,7 @@ namespace Contilog.Handlers.Topics
         public async Task<DeleteTopicResponse> Handle(DeleteTopicRequest request)
         {
             // Business logic: Get the topic first to check if it's archived
-            var topic = await _topicRepository.GetTopicByIdAsync(request.TopicId);
+            var topic = await _topicRepository.GetTopicById(request.TopicId);
             if (topic == null)
             {
                 return new DeleteTopicResponse(false);
@@ -122,14 +122,14 @@ namespace Contilog.Handlers.Topics
             }
 
             // Delete all posts associated with the topic first
-            var posts = await _postRepository.GetPostsByTopicIdAsync(request.TopicId);
+            var posts = await _postRepository.GetPostsByTopicId(request.TopicId);
             foreach (var post in posts)
             {
-                await _postRepository.DeletePostAsync(post.Id);
+                await _postRepository.DeletePost(post.Id);
             }
 
             // Then delete the topic itself
-            var success = await _topicRepository.DeleteTopicAsync(request.TopicId);
+            var success = await _topicRepository.DeleteTopic(request.TopicId);
             return new DeleteTopicResponse(success);
         }
     }

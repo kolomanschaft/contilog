@@ -40,25 +40,25 @@ namespace Contilog.Repositories
             };
         }
 
-        public async Task<IEnumerable<Post>> GetPostsByTopicIdAsync(int topicId)
+        public async Task<IEnumerable<Post>> GetPostsByTopicId(int topicId)
         {
             var posts = _posts.Where(p => p.TopicId == topicId).OrderByDescending(p => p.CreatedDate).AsEnumerable();
             return await Task.FromResult(posts);
         }
 
-        public async Task<Post?> GetPostByIdAsync(int id)
+        public async Task<Post?> GetPostById(int id)
         {
             var post = _posts.FirstOrDefault(p => p.Id == id);
             return await Task.FromResult(post);
         }
 
-        public Task<int> GetPostCountByTopicIdAsync(int topicId)
+        public Task<int> GetPostCountByTopicId(int topicId)
         {
             var count = _posts.Count(p => p.TopicId == topicId);
             return Task.FromResult(count);
         }
 
-        public Task<Post?> UpdatePostAsync(Post post)
+        public Task<Post?> UpdatePost(Post post)
         {
             var existingPost = _posts.FirstOrDefault(p => p.Id == post.Id);
             if (existingPost != null)
@@ -71,7 +71,7 @@ namespace Contilog.Repositories
             return Task.FromResult<Post?>(null);
         }
 
-        public Task<Post?> CreatePostAsync(Post post)
+        public Task<Post?> CreatePost(Post post)
         {
             // Generate new ID
             var nextId = _posts.Any() ? _posts.Max(p => p.Id) + 1 : 1;
@@ -90,7 +90,7 @@ namespace Contilog.Repositories
             return Task.FromResult<Post?>(newPost);
         }
 
-        public Task<bool> DeletePostAsync(int id)
+        public Task<bool> DeletePost(int id)
         {
             var postToDelete = _posts.FirstOrDefault(p => p.Id == id);
             if (postToDelete != null)

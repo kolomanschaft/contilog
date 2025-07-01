@@ -10,27 +10,27 @@ namespace Contilog.Repositories
         {
             _categories = new List<Category>
             {
-                new Category { Id = 1, Name = "Web Development", Description = "Frontend and full-stack web development topics", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
-                new Category { Id = 2, Name = "Backend", Description = "Server-side development and API topics", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
-                new Category { Id = 3, Name = "Database", Description = "Database design, optimization, and management", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
-                new Category { Id = 4, Name = "Frontend", Description = "Client-side development and user interfaces", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
-                new Category { Id = 5, Name = "DevOps", Description = "Development operations and deployment", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
-                new Category { Id = 6, Name = "Quality Assurance", Description = "Testing strategies and quality control", CreatedDate = DateTime.Now.AddDays(-100), IsActive = false }
+                new Category { Id = 1, Name = "Web Development", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
+                new Category { Id = 2, Name = "Backend", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
+                new Category { Id = 3, Name = "Database", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
+                new Category { Id = 4, Name = "Frontend", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
+                new Category { Id = 5, Name = "DevOps", CreatedDate = DateTime.Now.AddDays(-100), IsActive = true },
+                new Category { Id = 6, Name = "Quality Assurance", CreatedDate = DateTime.Now.AddDays(-100), IsActive = false }
             };
         }
 
-        public async Task<IEnumerable<Category>> GetAllCategoriesAsync()
+        public async Task<IEnumerable<Category>> GetAllCategories()
         {
             return await Task.FromResult(_categories);
         }
 
-        public async Task<Category?> GetCategoryByIdAsync(int id)
+        public async Task<Category?> GetCategoryById(int id)
         {
             var category = _categories.FirstOrDefault(c => c.Id == id);
             return await Task.FromResult(category);
         }
 
-        public Task<Category?> CreateCategoryAsync(Category category)
+        public Task<Category?> CreateCategory(Category category)
         {
             // Generate a new ID
             var maxId = _categories.Any() ? _categories.Max(c => c.Id) : 0;
@@ -44,7 +44,7 @@ namespace Contilog.Repositories
             return Task.FromResult<Category?>(category);
         }
 
-        public Task<Category?> UpdateCategoryAsync(Category category)
+        public Task<Category?> UpdateCategory(Category category)
         {
             var existingCategory = _categories.FirstOrDefault(c => c.Id == category.Id);
             if (existingCategory == null)
@@ -54,7 +54,6 @@ namespace Contilog.Repositories
 
             // Update the existing category
             existingCategory.Name = category.Name;
-            existingCategory.Description = category.Description;
             existingCategory.IsActive = category.IsActive;
 
             return Task.FromResult<Category?>(existingCategory);
