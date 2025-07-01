@@ -1,11 +1,15 @@
 @page "/topics/{topicId:int}"
 @using Contilog.Models
-@using Contilog.Repositories
+@using Contilog.Handlers.Topics
+@using Contilog.Handlers.Categories
+@using Contilog.Handlers.Posts
 @using System.Linq
-@using Microsoft.AspNetCore.Components.Forms
-@inject ITopicRepository TopicRepository
-@inject ICategoryRepository CategoryRepository
-@inject IPostRepository PostRepository
+@inject IGetTopicByIdHandler GetTopicByIdHandler
+@inject IGetCategoryByIdHandler GetCategoryByIdHandler
+@inject IGetPostsByTopicIdHandler GetPostsByTopicIdHandler
+@inject ICreatePostHandler CreatePostHandler
+@inject IUpdatePostHandler UpdatePostHandler
+@inject IDeletePostHandler DeletePostHandler
 
 <PageTitle>@topicTitle</PageTitle>
 
@@ -121,13 +125,15 @@ else
 
     private async Task LoadTopicData()
     {
-        topic = await TopicRepository.GetTopicById(TopicId);
+        var topicResponse = await GetTopicByIdHandler.Handle(new GetTopicByIdRequest(TopicId));
+        topic = topicResponse.Topic;
         if (topic != null)
         {
             topicTitle = topic.Title;
-            var topicPosts = await PostRepository.GetPostsByTopicId(TopicId);
-            posts = topicPosts.ToList();
-            category = await CategoryRepository.GetCategoryById(topic.CategoryId);
+            var postsResponse = await GetPostsByTopicIdHandler.Handle(new GetPostsByTopicIdRequest(TopicId));
+            posts = postsResponse.Posts.ToList();
+            var categoryResponse = await GetCategoryByIdHandler.Handle(new GetCategoryByIdRequest(topic.CategoryId));
+            category = categoryResponse.Category;
             if (category != null)
             {
                 categoryName = category.Name;
@@ -176,15 +182,15 @@ else
     {
         if (editingPostId.HasValue)
         {
-            // Update the post in the repository
-            var  updatedPost = await PostRepository.UpdatePost(editedPost);
-            if (updatedPost != null)
+            // Update the post using handler
+            var response = await UpdatePostHandler.Handle(new UpdatePostRequest(editedPost.Id, editedPost.Content));
+            if (response.Success && response.Post != null)
             {
                 // Update the local list
                 var postIndex = posts.FindIndex(p => p.Id == editingPostId.Value);
                 if (postIndex >= 0)
                 {
-                    posts[postIndex] = updatedPost;
+                    posts[postIndex] = response.Post;
                 }
                 
                 // Exit edit mode
@@ -210,12 +216,12 @@ else
     {
         if (topic != null && !string.IsNullOrWhiteSpace(newPostData.Content))
         {
-            // Create the post in the repository
-            var createdPost = await PostRepository.CreatePost(newPostData);
-            if (createdPost != null)
+            // Create the post using handler
+            var response = await CreatePostHandler.Handle(new CreatePostRequest(newPostData.Content, TopicId, newPostData.Author));
+            if (response.Success && response.Post != null)
             {
                 // Add to local list
-                posts.Add(createdPost);
+                posts.Add(response.Post);
                 
                 // Exit add mode
                 isAddingNewPost = false;
@@ -242,8 +248,8 @@ else
     {
         if (postToDelete.Id > 0)
         {
-            var success = await PostRepository.DeletePost(postToDelete.Id);
-            if (success)
+            var response = await DeletePostHandler.Handle(new DeletePostRequest(postToDelete.Id));
+            if (response.Success)
             {
                 // Remove from local list
                 posts.RemoveAll(p => p.Id == postToDelete.Id);

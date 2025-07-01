@@ -19,6 +19,22 @@ namespace Contilog.Handlers.Categories
         }
     }
 
+    public class GetCategoryByIdHandler : IGetCategoryByIdHandler
+    {
+        private readonly ICategoryRepository _categoryRepository;
+
+        public GetCategoryByIdHandler(ICategoryRepository categoryRepository)
+        {
+            _categoryRepository = categoryRepository;
+        }
+
+        public async Task<GetCategoryByIdResponse> Handle(GetCategoryByIdRequest request)
+        {
+            var category = await _categoryRepository.GetCategoryById(request.CategoryId);
+            return new GetCategoryByIdResponse(category);
+        }
+    }
+
     public class CreateCategoryHandler : ICreateCategoryHandler
     {
         private readonly ICategoryRepository _categoryRepository;

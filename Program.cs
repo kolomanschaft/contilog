@@ -18,12 +18,14 @@ builder.Services.AddSingleton<IPostRepository, PostRepository>();
 
 // Register topic handlers
 builder.Services.AddScoped<IGetAllTopicsHandler, GetAllTopicsHandler>();
+builder.Services.AddScoped<IGetTopicByIdHandler, GetTopicByIdHandler>();
 builder.Services.AddScoped<ICreateTopicHandler, CreateTopicHandler>();
 builder.Services.AddScoped<IArchiveTopicHandler, ArchiveTopicHandler>();
 builder.Services.AddScoped<IDeleteTopicHandler, DeleteTopicHandler>();
 
 // Register category handlers
 builder.Services.AddScoped<IGetAllCategoriesHandler, GetAllCategoriesHandler>();
+builder.Services.AddScoped<IGetCategoryByIdHandler, GetCategoryByIdHandler>();
 builder.Services.AddScoped<ICreateCategoryHandler, CreateCategoryHandler>();
 builder.Services.AddScoped<IUpdateCategoryHandler, UpdateCategoryHandler>();
 builder.Services.AddScoped<IArchiveCategoryHandler, ArchiveCategoryHandler>();

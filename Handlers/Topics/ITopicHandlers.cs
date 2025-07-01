@@ -4,6 +4,10 @@ namespace Contilog.Handlers.Topics
     {
     }
 
+    public interface IGetTopicByIdHandler : IHandler<GetTopicByIdRequest, GetTopicByIdResponse>
+    {
+    }
+
     public interface ICreateTopicHandler : IHandler<CreateTopicRequest, CreateTopicResponse>
     {
     }

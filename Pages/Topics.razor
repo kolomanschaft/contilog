@@ -189,7 +189,7 @@ else
         }
         // When showArchived is true, show both active and archived categories
         
-        var result = filteredCategories.OrderBy(c => c.Name).ToList();
+        var result = filteredCategories.OrderBy(c => c.CreatedDate).ToList();
         
         // Add temporary new category if we're adding one
         if (addingNewCategory)
