@@ -24,6 +24,7 @@ builder.Services.AddScoped<IDeleteTopicHandler, DeleteTopicHandler>();
 
 // Register category handlers
 builder.Services.AddScoped<IGetAllCategoriesHandler, GetAllCategoriesHandler>();
+builder.Services.AddScoped<ICreateCategoryHandler, CreateCategoryHandler>();
 builder.Services.AddScoped<IUpdateCategoryHandler, UpdateCategoryHandler>();
 builder.Services.AddScoped<IArchiveCategoryHandler, ArchiveCategoryHandler>();
 

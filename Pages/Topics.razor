@@ -11,6 +11,7 @@
 @inject IArchiveTopicHandler ArchiveTopicHandler
 @inject IDeleteTopicHandler DeleteTopicHandler
 @inject IGetAllCategoriesHandler GetAllCategoriesHandler
+@inject ICreateCategoryHandler CreateCategoryHandler
 @inject IUpdateCategoryHandler UpdateCategoryHandler
 @inject IArchiveCategoryHandler ArchiveCategoryHandler
 @inject IGetPostCountByTopicIdHandler GetPostCountByTopicIdHandler
@@ -51,11 +52,11 @@ else
             Category="category"
             Topics="GetTopicsByCategory(category)"
             PostCounts="postCounts"
-            IsEditing="editingCategoryId == category.Id"
+            IsEditing="(category.Id == -1 && addingNewCategory) || editingCategoryId == category.Id"
             IsAddingTopic="addingTopicToCategoryId == category.Id"
             OnEditRequested="() => StartEditingCategory(category.Id)"
-            OnEditCancelled="CancelEditCategory"
-            OnCategoryNameSubmitted="(name) => OnCategoryNameSubmitted(name, category.Id)"
+            OnEditCancelled="() => CancelCategoryEdit(category.Id)"
+            OnCategoryNameSubmitted="category.Id == -1 ? (Func<string, Task>)(name => OnNewCategoryNameSubmitted(name)) : (name => OnExistingCategoryNameSubmitted(name, category.Id))"
             OnArchiveRequested="() => ShowArchiveCategoryConfirmation(category.Id)"
             OnAddTopicRequested="() => StartAddingTopic(category.Id)"
             OnAddTopicCancelled="CancelNewTopic"
@@ -64,8 +65,8 @@ else
             OnTopicArchiveRequested="ShowArchiveConfirmation"
             OnTopicDeleteRequested="ShowDeleteConfirmation" />
     }
-    <div class="d-flex justify-content-center mt-4">
-        <button class="btn btn-primary btn-lg" >
+    <div class="d-flex justify-content-center mt-4 mb-4">
+        <button class="btn btn-primary btn-lg" @onclick="StartAddingCategory">
             <span class="oi oi-plus" aria-hidden="true"></span>
             Add Category
         </button>
@@ -121,6 +122,9 @@ else
     
     // Edit category
     private int? editingCategoryId = null;
+    
+    // Add new category
+    private bool addingNewCategory = false;
     
     // Archive category confirmation
     private bool showArchiveCategoryConfirmation = false;
@@ -184,7 +188,23 @@ else
             filteredCategories = categories.Where(c => c.IsActive);
         }
         // When showArchived is true, show both active and archived categories
-        return filteredCategories.OrderBy(c => c.Name);
+        
+        var result = filteredCategories.OrderBy(c => c.Name).ToList();
+        
+        // Add temporary new category if we're adding one
+        if (addingNewCategory)
+        {
+            result.Add(new Category 
+            { 
+                Id = -1, // Temporary ID
+                Name = "", 
+                Description = "", 
+                IsActive = true, 
+                CreatedDate = DateTime.Now 
+            });
+        }
+        
+        return result;
     }
 
     private int GetPostCount(int topicId)
@@ -339,10 +359,57 @@ else
         StateHasChanged();
     }
 
-    private async Task OnCategoryNameSubmitted(string name, int categoryId)
+    private void CancelCategoryEdit(int categoryId)
+    {
+        if (categoryId == -1)
+        {
+            // Cancel adding new category
+            addingNewCategory = false;
+        }
+        else
+        {
+            // Cancel editing existing category
+            editingCategoryId = null;
+        }
+        StateHasChanged();
+    }
+
+    private void StartAddingCategory()
+    {
+        addingNewCategory = true;
+        StateHasChanged();
+    }
+
+    private async Task OnNewCategoryNameSubmitted(string name)
     {
         if (!string.IsNullOrWhiteSpace(name))
         {
+            // Create new category
+            var createCategoryRequest = new CreateCategoryRequest(name.Trim());
+            var createCategoryResponse = await CreateCategoryHandler.Handle(createCategoryRequest);
+            
+            if (createCategoryResponse.Success && createCategoryResponse.Category != null)
+            {
+                // Add to local list
+                categories?.Add(createCategoryResponse.Category);
+                
+                // Exit add mode
+                addingNewCategory = false;
+                StateHasChanged();
+            }
+            else
+            {
+                // TODO: Show error message to user
+                Console.WriteLine("Failed to create new category");
+            }
+        }
+    }
+
+    private async Task OnExistingCategoryNameSubmitted(string name, int categoryId)
+    {
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            // Update existing category
             var updateCategoryRequest = new UpdateCategoryRequest(categoryId, name.Trim());
             var updateCategoryResponse = await UpdateCategoryHandler.Handle(updateCategoryRequest);
             

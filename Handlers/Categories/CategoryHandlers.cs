@@ -19,6 +19,38 @@ namespace Contilog.Handlers.Categories
         }
     }
 
+    public class CreateCategoryHandler : ICreateCategoryHandler
+    {
+        private readonly ICategoryRepository _categoryRepository;
+
+        public CreateCategoryHandler(ICategoryRepository categoryRepository)
+        {
+            _categoryRepository = categoryRepository;
+        }
+
+        public async Task<CreateCategoryResponse> Handle(CreateCategoryRequest request)
+        {
+            // Business logic: validate the request
+            if (string.IsNullOrWhiteSpace(request.Name))
+            {
+                return new CreateCategoryResponse(null, false);
+            }
+
+            // Create the new category
+            var newCategory = new Category
+            {
+                Name = request.Name.Trim(),
+                Description = "", // Default empty description
+                IsActive = true,
+                CreatedDate = DateTime.Now
+            };
+
+            // Save via repository
+            var createdCategory = await _categoryRepository.CreateCategoryAsync(newCategory);
+            return new CreateCategoryResponse(createdCategory, createdCategory != null);
+        }
+    }
+
     public class UpdateCategoryHandler : IUpdateCategoryHandler
     {
         private readonly ICategoryRepository _categoryRepository;

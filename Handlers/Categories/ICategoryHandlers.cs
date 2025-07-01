@@ -6,6 +6,10 @@ namespace Contilog.Handlers.Categories
     {
     }
     
+    public interface ICreateCategoryHandler : IHandler<CreateCategoryRequest, CreateCategoryResponse>
+    {
+    }
+    
     public interface IUpdateCategoryHandler : IHandler<UpdateCategoryRequest, UpdateCategoryResponse>
     {
     }

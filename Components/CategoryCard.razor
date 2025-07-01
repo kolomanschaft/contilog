@@ -41,63 +41,66 @@
                 </div>
             }
         </div>
-        <div class="card-body topics-card-body">
-            <QuickGrid Items="@Topics" Class="table topics-table topics-grid">
-                <TemplateColumn Title="Topics" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Title))">
-                    <div class="@(context.IsActive ? "" : "text-muted")">
-                        @context.Title
-                        @if (!context.IsActive)
-                        {
-                            <span class="badge bg-secondary ms-2">Archived</span>
-                        }
-                    </div>
-                </TemplateColumn>
-                <TemplateColumn Title="Author" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Author))">
-                    <div class="@(context.IsActive ? "" : "text-muted")">
-                        @context.Author
-                    </div>
-                </TemplateColumn>
-                <TemplateColumn Title="Posts" Sortable="true" SortBy="@(GridSort<Topic>.ByDescending(t => GetPostCount(t.Id)))">
-                    <div class="@(context.IsActive ? "" : "text-muted") text-center">
-                        @GetPostCount(context.Id)
-                    </div>
-                </TemplateColumn>
-                <TemplateColumn>
-                    <div class="topics-action-cell">
-                        <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => OnViewPostsRequested.InvokeAsync(context.Id)" title="Write Posts">
-                            <span class="oi @(context.IsActive ? "oi-pencil" : "oi-eye")" aria-hidden="true"></span>
+        @if (Category.Id > 0)
+        {
+            <div class="card-body topics-card-body">
+                <QuickGrid Items="@Topics" Class="table topics-table topics-grid">
+                    <TemplateColumn Title="Topics" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Title))">
+                        <div class="@(context.IsActive ? "" : "text-muted")">
+                            @context.Title
+                            @if (!context.IsActive)
+                            {
+                                <span class="badge bg-secondary ms-2">Archived</span>
+                            }
+                        </div>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Author" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Author))">
+                        <div class="@(context.IsActive ? "" : "text-muted")">
+                            @context.Author
+                        </div>
+                    </TemplateColumn>
+                    <TemplateColumn Title="Posts" Sortable="true" SortBy="@(GridSort<Topic>.ByDescending(t => GetPostCount(t.Id)))">
+                        <div class="@(context.IsActive ? "" : "text-muted") text-center">
+                            @GetPostCount(context.Id)
+                        </div>
+                    </TemplateColumn>
+                    <TemplateColumn>
+                        <div class="topics-action-cell">
+                            <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => OnViewPostsRequested.InvokeAsync(context.Id)" title="Write Posts">
+                                <span class="oi @(context.IsActive ? "oi-pencil" : "oi-eye")" aria-hidden="true"></span>
+                            </button>
+                            @if (context.IsActive)
+                            {
+                                <button class="btn btn-sm btn-outline-warning" @onclick="() => OnTopicArchiveRequested.InvokeAsync(context.Id)" title="Archive Topic">
+                                    <span class="oi oi-box" aria-hidden="true"></span>
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => OnTopicDeleteRequested.InvokeAsync(context.Id)" title="Delete Topic">
+                                    <span class="oi oi-trash" aria-hidden="true"></span>
+                                </button>
+                            }
+                        </div>
+                    </TemplateColumn>
+                </QuickGrid>
+                
+                <StringEditor 
+                    IsVisible="IsAddingTopic"
+                    Placeholder="Enter topic title..."
+                    OnTextSubmitted="OnTopicTitleSubmitted"
+                    OnCancelled="OnAddTopicCancelled" />
+                
+                @if (Category.IsActive && !IsAddingTopic)
+                {
+                    <div class="mt-1 mb-2 ps-2">
+                        <button class="btn btn-outline-primary" @onclick="OnAddTopicRequested" title="Add Topic">
+                            <span class="oi oi-plus" aria-hidden="true"></span>
                         </button>
-                        @if (context.IsActive)
-                        {
-                            <button class="btn btn-sm btn-outline-warning" @onclick="() => OnTopicArchiveRequested.InvokeAsync(context.Id)" title="Archive Topic">
-                                <span class="oi oi-box" aria-hidden="true"></span>
-                            </button>
-                        }
-                        else
-                        {
-                            <button class="btn btn-sm btn-outline-danger" @onclick="() => OnTopicDeleteRequested.InvokeAsync(context.Id)" title="Delete Topic">
-                                <span class="oi oi-trash" aria-hidden="true"></span>
-                            </button>
-                        }
                     </div>
-                </TemplateColumn>
-            </QuickGrid>
-            
-            <StringEditor 
-                IsVisible="IsAddingTopic"
-                Placeholder="Enter topic title..."
-                OnTextSubmitted="OnTopicTitleSubmitted"
-                OnCancelled="OnAddTopicCancelled" />
-            
-            @if (Category.IsActive && !IsAddingTopic)
-            {
-                <div class="mt-1 mb-2 ps-2">
-                    <button class="btn btn-outline-primary" @onclick="OnAddTopicRequested" title="Add Topic">
-                        <span class="oi oi-plus" aria-hidden="true"></span>
-                    </button>
-                </div>
-            }
-        </div>
+                }
+            </div>
+        }
     </div>
 </div>
 

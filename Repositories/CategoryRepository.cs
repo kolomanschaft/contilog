@@ -30,6 +30,20 @@ namespace Contilog.Repositories
             return await Task.FromResult(category);
         }
 
+        public Task<Category?> CreateCategoryAsync(Category category)
+        {
+            // Generate a new ID
+            var maxId = _categories.Any() ? _categories.Max(c => c.Id) : 0;
+            category.Id = maxId + 1;
+            category.CreatedDate = DateTime.Now;
+            category.IsActive = true;
+
+            // Add to the list
+            _categories.Add(category);
+
+            return Task.FromResult<Category?>(category);
+        }
+
         public Task<Category?> UpdateCategoryAsync(Category category)
         {
             var existingCategory = _categories.FirstOrDefault(c => c.Id == category.Id);
