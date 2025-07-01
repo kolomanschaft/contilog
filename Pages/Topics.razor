@@ -21,7 +21,7 @@
 
 <div class="topics-header">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Topics</h1>
+        <h1>Categories</h1>
         <button class="btn btn-outline-secondary" @onclick="ToggleArchiveVisibility">
             <span class="oi @(showArchived ? "oi-eye-closed" : "oi-eye")" aria-hidden="true"></span>
             @(showArchived ? "Hide archived" : "Show archived")
@@ -39,6 +39,13 @@
 }
 else
 {
+    @if (categories == null || !categories.Any())
+    {
+        <div class="alert alert-info no-categories-info">
+            <h5>No categories</h5>
+            <p>Click the button to add a new category and add topics.</p>
+        </div>
+    }
     @foreach (var category in GetVisibleCategories())
     {
         <div class="category-container">
@@ -102,7 +109,7 @@ else
                         <TemplateColumn>
                             <div class="topics-action-cell">
                                 <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => ViewPosts(context.Id)" title="Write Posts">
-                                    <span class="oi oi-pencil" aria-hidden="true"></span>
+                                    <span class="oi @(context.IsActive ? "oi-pencil" : "oi-eye")" aria-hidden="true"></span>
                                 </button>
                                 @if (context.IsActive)
                                 {
@@ -138,6 +145,12 @@ else
             </div>
         </div>
     }
+    <div class="d-flex justify-content-center mt-4">
+        <button class="btn btn-primary btn-lg" >
+            <span class="oi oi-plus" aria-hidden="true"></span>
+            Add Category
+        </button>
+    </div>
 }
 
 <ConfirmationDialog 

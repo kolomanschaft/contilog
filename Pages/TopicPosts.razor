@@ -63,6 +63,7 @@ else
                 {
                     <PostCard Post="post" 
                               IsEditing="editingPostId == post.Id"
+                              CanEdit="topic.IsActive"
                               OnEditRequested="HandleEditRequested"
                               OnSaveRequested="HandleSaveRequested"
                               OnCancelRequested="HandleCancelRequested"
