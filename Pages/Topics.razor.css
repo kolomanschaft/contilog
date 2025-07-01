@@ -4,52 +4,6 @@
     margin: 0 auto 2rem auto;
 }
 
-.topics-grid {
-    background-color: var(--bg-muted);
-    table-layout: fixed;
-    width: 100%;
-}
-
-.topics-grid tbody tr td,
-.topics-grid thead tr th {
-    vertical-align: middle !important;
-    padding: 12px 8px;
-}
-
-.topics-grid tbody tr td > div {
-    display: flex;
-    align-items: center;
-    min-height: 40px;
-}
-
-.category-container {
-    margin-bottom: 3rem;
-}
-
-.topics-card {
-    box-shadow: var(--shadow-md);
-    max-width: var(--card-max-width);
-    margin: 0 auto;
-}
-
-.topics-card-header {
-    background-color: var(--primary-light);
-    color: var(--text-primary);
-}
-
-.topics-card-title {
-    margin-bottom: 0;
-}
-
-.topics-card-body {
-    padding: 0;
-    overflow-x: auto; /* Allow horizontal scrolling on very small screens */
-}
-
-.topics-table {
-    margin-bottom: 0;
-}
-
 /* Topic link styling */
 .topic-link {
     color: var(--text-link);
@@ -60,45 +14,6 @@
 .topic-link:hover {
     color: var(--primary-dark);
     text-decoration: underline;
-}
-
-/* Mobile-friendly action button */
-.topics-action-cell {
-    text-align: right;
-    display: flex !important;
-    justify-content: flex-end;
-    align-items: center;
-    min-height: 40px;
-    gap: 0.25rem;
-}
-
-.topics-action-cell .btn {
-    min-width: 40px;
-}
-
-/* Category action buttons - match topic button sizing */
-.topics-card-header .btn {
-    min-width: 40px;
-}
-
-/* Posts count column styling */
-.topics-grid .text-center {
-    font-weight: 500;
-}
-
-/* Inactive topic styling */
-.topics-grid tbody tr.inactive-topic {
-    opacity: 0.6;
-    background-color: var(--bg-secondary);
-}
-
-.topics-grid tbody tr.inactive-topic td {
-    color: var(--text-muted);
-}
-
-/* Topic input styling */
-.topic-input {
-    max-width: 600px;
 }
 
 /* Add topic button icon alignment */

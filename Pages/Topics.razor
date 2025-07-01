@@ -3,7 +3,6 @@
 @using Contilog.Handlers.Topics
 @using Contilog.Handlers.Categories
 @using Contilog.Handlers.Posts
-@using Contilog.Components
 @using System.Linq
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.AspNetCore.Components.Web
@@ -48,102 +47,22 @@ else
     }
     @foreach (var category in GetVisibleCategories())
     {
-        <div class="category-container">
-            <div class="card topics-card">
-                <div class="card-header topics-card-header">
-                    @if (editingCategoryId == category.Id)
-                    {
-                        @* Category name editor *@
-                        <StringEditor 
-                            IsVisible="true"
-                            Placeholder="Enter category name..."
-                            InitialValue="@category.Name"
-                            OnTextSubmitted="(name) => OnCategoryNameSubmitted(name, category.Id)"
-                            OnCancelled="CancelEditCategory" />
-                    }
-                    else
-                    {
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="card-title topics-card-title @(category.IsActive ? "" : "text-muted") mb-0">
-                                @category.Name
-                                @if (!category.IsActive)
-                                {
-                                    <span class="badge bg-secondary ms-2">Archived</span>
-                                }
-                            </h5>
-                            @if (category.IsActive)
-                            {
-                                <div class="d-flex gap-1">
-                                    <button class="btn btn-sm btn-primary" @onclick="() => StartEditingCategory(category.Id)" title="Edit Category Name">
-                                        <span class="oi oi-pencil" aria-hidden="true"></span>
-                                    </button>
-                                    <button class="btn btn-sm btn-warning" @onclick="() => ShowArchiveCategoryConfirmation(category.Id)" title="Archive Category">
-                                        <span class="oi oi-box" aria-hidden="true"></span>
-                                    </button>
-                                </div>
-                            }
-                        </div>
-                    }
-                </div>
-                <div class="card-body topics-card-body">
-                    <QuickGrid Items="@GetTopicsByCategory(category)" Class="table topics-table topics-grid">
-                        <TemplateColumn Title="Topics" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Title))">
-                            <div class="@(context.IsActive ? "" : "text-muted")">
-                                @context.Title
-                                @if (!context.IsActive)
-                                {
-                                    <span class="badge bg-secondary ms-2">Archived</span>
-                                }
-                            </div>
-                        </TemplateColumn>
-                        <TemplateColumn Title="Author" Sortable="true" SortBy="@(GridSort<Topic>.ByAscending(t => t.Author))">
-                            <div class="@(context.IsActive ? "" : "text-muted")">
-                                @context.Author
-                            </div>
-                        </TemplateColumn>
-                        <TemplateColumn Title="Posts" Sortable="true" SortBy="@(GridSort<Topic>.ByDescending(t => GetPostCount(t.Id)))">
-                            <div class="@(context.IsActive ? "" : "text-muted") text-center">
-                                @GetPostCount(context.Id)
-                            </div>
-                        </TemplateColumn>
-                        <TemplateColumn>
-                            <div class="topics-action-cell">
-                                <button class="btn btn-sm btn-outline-primary me-1" @onclick="() => ViewPosts(context.Id)" title="Write Posts">
-                                    <span class="oi @(context.IsActive ? "oi-pencil" : "oi-eye")" aria-hidden="true"></span>
-                                </button>
-                                @if (context.IsActive)
-                                {
-                                    <button class="btn btn-sm btn-outline-warning" @onclick="() => ShowArchiveConfirmation(context.Id)" title="Archive Topic">
-                                        <span class="oi oi-box" aria-hidden="true"></span>
-                                    </button>
-                                }
-                                else
-                                {
-                                    <button class="btn btn-sm btn-outline-danger" @onclick="() => ShowDeleteConfirmation(context.Id)" title="Delete Topic">
-                                        <span class="oi oi-trash" aria-hidden="true"></span>
-                                    </button>
-                                }
-                            </div>
-                        </TemplateColumn>
-                    </QuickGrid>
-                    
-                    <StringEditor 
-                        IsVisible="addingTopicToCategoryId == category.Id"
-                        Placeholder="Enter topic title..."
-                        OnTextSubmitted="(title) => OnTopicTitleSubmitted(title, category.Id)"
-                        OnCancelled="CancelNewTopic" />
-                    
-                    @if (category.IsActive && addingTopicToCategoryId != category.Id)
-                    {
-                        <div class="mt-1 mb-2 ps-2">
-                            <button class="btn btn-outline-primary" @onclick="() => StartAddingTopic(category.Id)" title="Add Topic">
-                                <span class="oi oi-plus" aria-hidden="true"></span>
-                            </button>
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
+        <CategoryCard 
+            Category="category"
+            Topics="GetTopicsByCategory(category)"
+            PostCounts="postCounts"
+            IsEditing="editingCategoryId == category.Id"
+            IsAddingTopic="addingTopicToCategoryId == category.Id"
+            OnEditRequested="() => StartEditingCategory(category.Id)"
+            OnEditCancelled="CancelEditCategory"
+            OnCategoryNameSubmitted="(name) => OnCategoryNameSubmitted(name, category.Id)"
+            OnArchiveRequested="() => ShowArchiveCategoryConfirmation(category.Id)"
+            OnAddTopicRequested="() => StartAddingTopic(category.Id)"
+            OnAddTopicCancelled="CancelNewTopic"
+            OnTopicTitleSubmitted="(title) => OnTopicTitleSubmitted(title, category.Id)"
+            OnViewPostsRequested="ViewPosts"
+            OnTopicArchiveRequested="ShowArchiveConfirmation"
+            OnTopicDeleteRequested="ShowDeleteConfirmation" />
     }
     <div class="d-flex justify-content-center mt-4">
         <button class="btn btn-primary btn-lg" >
