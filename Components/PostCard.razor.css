@@ -3,11 +3,6 @@
     background-color: var(--bg-white);
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-sm);
-    transition: box-shadow 0.2s ease;
-}
-
-.post-card:hover {
-    box-shadow: var(--shadow-md);
 }
 
 .post-header {
@@ -69,42 +64,10 @@
     min-width: 200px;
 }
 
-.post-edit-button {
-    display: flex;
-    justify-content: flex-end;
-}
-
 .post-action-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 0.25rem;
-}
-
-.post-edit-button .btn, .post-action-buttons .btn {
-    font-size: 1rem;
-    padding: 0.5rem 0.75rem;
-    line-height: 1.2;
-    min-width: 44px;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-/* Style the Add Decision button with decision colors */
-.post-action-buttons .btn-outline-success {
-    border-color: var(--decision-text);
-    color: var(--decision-text);
-}
-
-.post-action-buttons .btn-outline-success:hover {
-    background-color: var(--decision-text);
-    border-color: var(--decision-text);
-    color: var(--white);
-}
-
-.post-action-buttons .btn-outline-success:focus {
-    box-shadow: 0 0 0 0.2rem rgba(184, 134, 11, 0.25);
 }
 
 .post-meta-top .post-author {
@@ -115,30 +78,6 @@
 
 .post-meta-top .post-date {
     color: var(--text-muted);
-}
-
-/* Post Editor Styling */
-.post-editor {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 1rem;
-    line-height: 1.6;
-    border: 2px solid var(--border-color);
-    border-radius: 0.375rem;
-    padding: 0.75rem;
-    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    resize: vertical;
-    min-height: 200px;
-}
-
-.post-editor:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 0.2rem rgba(var(--primary-rgb), 0.25);
-    outline: 0;
-}
-
-.post-editor::placeholder {
-    color: var(--text-muted);
-    opacity: 0.8;
 }
 
 /* Edit form styling */

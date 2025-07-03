@@ -55,15 +55,6 @@
     gap: 0.25rem;
 }
 
-.topics-action-cell .btn {
-    min-width: 40px;
-}
-
-/* Category action buttons - match topic button sizing */
-.topics-card-header .btn {
-    min-width: 40px;
-}
-
 /* Posts count column styling */
 .topics-grid .text-center {
     font-weight: 500;

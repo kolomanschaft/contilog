@@ -4,13 +4,7 @@
     margin-right: auto;
     border-left: 4px solid var(--decision-border);
     background-color: var(--decision-bg);
-    border: 2px solid var(--decision-border);
-    transition: box-shadow 0.2s ease, transform 0.1s ease;
-}
-
-.decision-card:hover {
-    box-shadow: 0 0.25rem 0.5rem rgba(184, 134, 11, 0.15);
-    transform: translateY(-1px);
+    border: 1px solid var(--decision-border);
 }
 
 .decision-content {
@@ -23,23 +17,15 @@
     line-height: 1.5;
     color: var(--decision-text);
     font-weight: 600;
+    margin-bottom: 0.5rem;
 }
 
 .decision-meta-top {
     min-width: 150px;
     font-size: 0.85rem;
-}
-
-.decision-author {
-    margin-bottom: 0.25rem;
-}
-
-.decision-date {
-    margin-bottom: 0.25rem;
-}
-
-.decision-edit-button {
-    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
 }
 
 .decision-header {
@@ -63,6 +49,73 @@
     font-weight: 600;
 }
 
+/* Decision info icon and tooltip */
+.decision-info {
+    position: relative;
+    display: inline-block;
+}
+
+.decision-info-icon {
+    font-size: 0.8rem;
+    color: var(--white);
+    background-color: var(--decision-text);
+    cursor: help;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.decision-info-icon:hover {
+    opacity: 1;
+}
+
+.decision-info-tooltip {
+    position: absolute;
+    top: -5px;
+    left: 30px;
+    background-color: var(--decision-text);
+    color: var(--white);
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
+}
+
+.decision-info-tooltip::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: -5px;
+    margin-top: -5px;
+    border: 5px solid transparent;
+    border-right-color: var(--decision-text);
+}
+
+.decision-info:hover .decision-info-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.decision-info-content div {
+    margin-bottom: 0.25rem;
+}
+
+.decision-info-content div:last-child {
+    margin-bottom: 0;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .decision-header {
@@ -73,10 +126,23 @@
         text-align: left !important;
         margin-top: 0.5rem;
         min-width: auto;
+        align-items: flex-start;
     }
     
-    .decision-edit-button {
-        text-align: left;
-        margin-bottom: 0.5rem;
+    .decision-info-tooltip {
+        left: 10px;
+        top: 25px;
+        white-space: normal;
+        width: 200px;
+    }
+    
+    .decision-info-tooltip::after {
+        top: -5px;
+        left: 50%;
+        margin-left: -5px;
+        margin-top: 0;
+        border: 5px solid transparent;
+        border-bottom-color: var(--decision-text);
+        border-right-color: transparent;
     }
 }

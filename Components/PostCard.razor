@@ -92,12 +92,16 @@
                     @if (CanEdit)
                     {
                         <div class="post-action-buttons mb-2">
-                            <button class="btn btn-outline-primary me-1" @onclick="OnEdit" title="Edit Post">
-                                <span class="oi oi-pencil" aria-hidden="true"></span>
-                            </button>
-                            <button class="btn btn-outline-success" @onclick="AddNewDecision" title="Add Decision">
-                                <span class="oi oi-people" aria-hidden="true"></span>
-                            </button>
+                            <ActionButton Icon="oi-pencil" 
+                                          Color="primary" 
+                                          IsOutlined="true" 
+                                          Title="Edit Post" 
+                                          OnClick="OnEdit" />
+                            <ActionButton Icon="oi-people" 
+                                          Color="decision" 
+                                          IsOutlined="true" 
+                                          Title="Add Decision" 
+                                          OnClick="AddNewDecision" />
                         </div>
                     }
                     <div class="post-author">

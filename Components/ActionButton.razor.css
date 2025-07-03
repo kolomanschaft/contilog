@@ -1,0 +1,45 @@
+.btn {
+    font-size: 0.875rem;
+    padding: 0.25rem 0.5rem;
+    margin-right: 0.1rem;
+    margin-left: 0.1rem;
+    line-height: 1.2;
+    min-width: 35px;
+    min-height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Custom color support for decision actions */
+.btn-outline-decision {
+    border-color: var(--decision-text);
+    color: var(--decision-text);
+}
+
+.btn-outline-decision:hover {
+    background-color: var(--decision-text);
+    border-color: var(--decision-text);
+    color: var(--white);
+}
+
+.btn-outline-decision:focus {
+    box-shadow: 0 0 0 0.2rem rgba(184, 134, 11, 0.25);
+}
+
+.btn-decision {
+    background-color: var(--decision-text);
+    border-color: var(--decision-text);
+    color: var(--white);
+}
+
+.btn-decision:hover {
+    background-color: var(--decision-text);
+    border-color: var(--decision-text);
+    color: var(--white);
+    opacity: 0.9;
+}
+
+.btn-decision:focus {
+    box-shadow: 0 0 0 0.2rem rgba(184, 134, 11, 0.25);
+}
