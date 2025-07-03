@@ -1,0 +1,25 @@
+@namespace Contilog.Components
+
+<div class="info-tooltip">
+    <span class="oi oi-info info-tooltip-icon" aria-hidden="true" style="background-color: var(--@(Color)-text);"></span>
+    <div class="info-tooltip-content" style="background-color: var(--@(Color)-text);">
+        <div class="info-tooltip-inner">
+            <div><strong>Author:</strong> @Author</div>
+            @if (CreatedDate > DateTime.MinValue)
+            {
+                <div><strong>Created:</strong> @CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")</div>
+            }
+            @if (ModifiedDate > DateTime.MinValue && !ModifiedDate.Equals(CreatedDate))
+            {
+                <div><strong>Modified:</strong> @ModifiedDate.ToString("MMM dd, yyyy 'at' h:mm tt")</div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Author { get; set; } = "";
+    [Parameter] public DateTime CreatedDate { get; set; } = DateTime.MinValue;
+    [Parameter] public DateTime ModifiedDate { get; set; } = DateTime.MinValue;
+    [Parameter] public string Color { get; set; } = "decision";
+}

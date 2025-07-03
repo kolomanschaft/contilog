@@ -7,5 +7,6 @@ namespace Contilog.Models
         public string Text { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
+        public DateTime ModifiedDate { get; set; }
     }
 }

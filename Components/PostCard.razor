@@ -1,7 +1,6 @@
 @namespace Contilog.Components
 @using Contilog.Models
 @using Microsoft.AspNetCore.Components.Forms
-@using Contilog.Components
 @using Contilog.Handlers.Decisions
 @inject IGetDecisionsByPostIdHandler GetDecisionsByPostIdHandler
 @inject ICreateDecisionHandler CreateDecisionHandler
@@ -92,12 +91,12 @@
                     @if (CanEdit)
                     {
                         <div class="post-action-buttons mb-2">
-                            <ActionButton Icon="oi-pencil" 
+                            <Contilog.Components.ActionButton Icon="oi-pencil" 
                                           Color="primary" 
                                           IsOutlined="true" 
                                           Title="Edit Post" 
                                           OnClick="OnEdit" />
-                            <ActionButton Icon="oi-people" 
+                            <Contilog.Components.ActionButton Icon="oi-people" 
                                           Color="decision" 
                                           IsOutlined="true" 
                                           Title="Add Decision" 
@@ -269,7 +268,8 @@
         newDecision = new Decision
         {
             PostId = Post.Id,
-            Author = "Current User" // TODO: Get from authentication context
+            Author = "Current User", // TODO: Get from authentication context
+            CreatedDate = DateTime.Now
         };
         isAddingNewDecision = true;
         editingDecisionId = 0;

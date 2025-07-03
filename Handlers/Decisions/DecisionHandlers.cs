@@ -66,8 +66,7 @@ namespace Contilog.Handlers.Decisions
             {
                 Text = request.Text.Trim(),
                 PostId = request.PostId,
-                Author = request.Author,
-                CreatedDate = DateTime.UtcNow
+                Author = request.Author
             };
 
             // Save via repository
