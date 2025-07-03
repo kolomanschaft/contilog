@@ -18,6 +18,11 @@
     --danger-color: #dc3545;
     --info-color: #17a2b8;
     
+    /* Decision Colors */
+    --decision-bg: #fffbf0;
+    --decision-text: #b8860b;
+    --decision-border: var(--decision-text);
+    
     /* Neutral Colors */
     --white: #ffffff;
     --light-gray: #f8f9fa;

@@ -2,6 +2,11 @@
 @using Contilog.Models
 @using Microsoft.AspNetCore.Components.Forms
 @using Contilog.Components
+@using Contilog.Handlers.Decisions
+@inject IGetDecisionsByPostIdHandler GetDecisionsByPostIdHandler
+@inject ICreateDecisionHandler CreateDecisionHandler
+@inject IUpdateDecisionHandler UpdateDecisionHandler
+@inject IDeleteDecisionHandler DeleteDecisionHandler
 
 <div class="card post-card mb-3">
     <div class="card-body">
@@ -86,9 +91,12 @@
                 <div class="post-meta-top text-end text-muted">
                     @if (CanEdit)
                     {
-                        <div class="post-edit-button mb-2">
-                            <button class="btn btn-outline-primary" @onclick="OnEdit" title="Edit Post">
+                        <div class="post-action-buttons mb-2">
+                            <button class="btn btn-outline-primary me-1" @onclick="OnEdit" title="Edit Post">
                                 <span class="oi oi-pencil" aria-hidden="true"></span>
+                            </button>
+                            <button class="btn btn-outline-success" @onclick="AddNewDecision" title="Add Decision">
+                                <span class="oi oi-people" aria-hidden="true"></span>
                             </button>
                         </div>
                     }
@@ -113,6 +121,38 @@
             </div>
         }
     </div>
+    
+    <!-- Decisions Section -->
+    @if (!IsEditing && decisions.Any())
+    {
+        <div class="decisions-section mt-3">
+            <h6 class="decisions-title text-muted mb-2">
+                <span class="oi oi-task" aria-hidden="true"></span>
+                Decisions (@decisions.Count())
+            </h6>
+            <div class="decisions-container">
+                @foreach (var decision in decisions.OrderBy(d => d.CreatedDate))
+                {
+                    <DecisionCard Decision="decision" 
+                                  IsEditing="editingDecisionId == decision.Id"
+                                  CanEdit="CanEdit"
+                                  OnEditRequested="HandleDecisionEditRequested"
+                                  OnSaveRequested="HandleDecisionSaveRequested"
+                                  OnCancelRequested="HandleDecisionCancelRequested"
+                                  OnDeleteRequested="HandleDecisionDeleteRequested" />
+                }
+                
+                @if (isAddingNewDecision)
+                {
+                    <DecisionCard Decision="newDecision" 
+                                  IsEditing="true"
+                                  OnEditRequested="HandleDecisionEditRequested"
+                                  OnSaveRequested="HandleNewDecisionSaveRequested"
+                                  OnCancelRequested="HandleNewDecisionCancelRequested" />
+                }
+            </div>
+        </div>
+    }
 </div>
 
 <ConfirmationDialog 
@@ -138,6 +178,12 @@
     private BlazoredTextEditor? textEditor;
     private bool showDeleteConfirmation = false;
 
+    // Decision-related fields
+    private List<Decision> decisions = new();
+    private int editingDecisionId = 0;
+    private bool isAddingNewDecision = false;
+    private Decision newDecision = new();
+
     protected override async Task OnParametersSetAsync()
     {
         if (IsEditing)
@@ -151,7 +197,21 @@
                 CreatedDate = Post.CreatedDate
             };
         }
+
+        // Load decisions for this post
+        if (Post.Id > 0)
+        {
+            await LoadDecisions();
+        }
+        
         await Task.CompletedTask;
+    }
+
+    private async Task LoadDecisions()
+    {
+        var request = new GetDecisionsByPostIdRequest(Post.Id);
+        var response = await GetDecisionsByPostIdHandler.Handle(request);
+        decisions = response.Decisions.ToList();
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -196,6 +256,77 @@
     {
         showDeleteConfirmation = false;
         await OnDeleteRequested.InvokeAsync(Post);
+        StateHasChanged();
+    }
+
+    // Decision handling methods
+    private void AddNewDecision()
+    {
+        newDecision = new Decision
+        {
+            PostId = Post.Id,
+            Author = "Current User" // TODO: Get from authentication context
+        };
+        isAddingNewDecision = true;
+        editingDecisionId = 0;
+        StateHasChanged();
+    }
+
+    private async Task HandleDecisionEditRequested(Decision decision)
+    {
+        editingDecisionId = decision.Id;
+        isAddingNewDecision = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleDecisionSaveRequested(Decision decision)
+    {
+        var request = new UpdateDecisionRequest(decision.Id, decision.Text);
+        var response = await UpdateDecisionHandler.Handle(request);
+        
+        if (response.Success)
+        {
+            editingDecisionId = 0;
+            await LoadDecisions();
+        }
+        StateHasChanged();
+    }
+
+    private async Task HandleDecisionCancelRequested()
+    {
+        editingDecisionId = 0;
+        isAddingNewDecision = false;
+        StateHasChanged();
+    }
+
+    private async Task HandleDecisionDeleteRequested(Decision decision)
+    {
+        var request = new DeleteDecisionRequest(decision.Id);
+        var response = await DeleteDecisionHandler.Handle(request);
+        
+        if (response.Success)
+        {
+            await LoadDecisions();
+        }
+        StateHasChanged();
+    }
+
+    private async Task HandleNewDecisionSaveRequested(Decision decision)
+    {
+        var request = new CreateDecisionRequest(decision.Text, Post.Id, decision.Author);
+        var response = await CreateDecisionHandler.Handle(request);
+        
+        if (response.Success)
+        {
+            isAddingNewDecision = false;
+            await LoadDecisions();
+        }
+        StateHasChanged();
+    }
+
+    private async Task HandleNewDecisionCancelRequested()
+    {
+        isAddingNewDecision = false;
         StateHasChanged();
     }
 }

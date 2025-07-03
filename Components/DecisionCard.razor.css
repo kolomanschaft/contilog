@@ -1,0 +1,82 @@
+.decision-card {
+    width: 90%;
+    margin-left: auto;
+    margin-right: auto;
+    border-left: 4px solid var(--decision-border);
+    background-color: var(--decision-bg);
+    border: 2px solid var(--decision-border);
+    transition: box-shadow 0.2s ease, transform 0.1s ease;
+}
+
+.decision-card:hover {
+    box-shadow: 0 0.25rem 0.5rem rgba(184, 134, 11, 0.15);
+    transform: translateY(-1px);
+}
+
+.decision-content {
+    flex: 1;
+    margin-right: 1rem;
+}
+
+.decision-text {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--decision-text);
+    font-weight: 600;
+}
+
+.decision-meta-top {
+    min-width: 150px;
+    font-size: 0.85rem;
+}
+
+.decision-author {
+    margin-bottom: 0.25rem;
+}
+
+.decision-date {
+    margin-bottom: 0.25rem;
+}
+
+.decision-edit-button {
+    text-align: right;
+}
+
+.decision-header {
+    align-items: flex-start;
+}
+
+/* Form controls in decision cards */
+.decision-card .form-control {
+    background-color: var(--white);
+    border: 1px solid var(--decision-border);
+    color: var(--decision-text);
+}
+
+.decision-card .form-control:focus {
+    border-color: var(--decision-text);
+    box-shadow: 0 0 0 0.2rem rgba(184, 134, 11, 0.25);
+}
+
+.decision-card .form-label {
+    color: var(--decision-text);
+    font-weight: 600;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .decision-header {
+        flex-direction: column;
+    }
+    
+    .decision-meta-top {
+        text-align: left !important;
+        margin-top: 0.5rem;
+        min-width: auto;
+    }
+    
+    .decision-edit-button {
+        text-align: left;
+        margin-bottom: 0.5rem;
+    }
+}

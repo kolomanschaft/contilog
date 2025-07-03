@@ -4,6 +4,7 @@ using Contilog.Repositories;
 using Contilog.Handlers.Topics;
 using Contilog.Handlers.Categories;
 using Contilog.Handlers.Posts;
+using Contilog.Handlers.Decisions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
 builder.Services.AddSingleton<ITopicRepository, TopicRepository>();
 builder.Services.AddSingleton<IPostRepository, PostRepository>();
+builder.Services.AddSingleton<IDecisionRepository, DecisionRepository>();
 
 // Register topic handlers
 builder.Services.AddScoped<IGetAllTopicsHandler, GetAllTopicsHandler>();
@@ -37,6 +39,13 @@ builder.Services.AddScoped<IGetPostCountByTopicIdHandler, GetPostCountByTopicIdH
 builder.Services.AddScoped<ICreatePostHandler, CreatePostHandler>();
 builder.Services.AddScoped<IUpdatePostHandler, UpdatePostHandler>();
 builder.Services.AddScoped<IDeletePostHandler, DeletePostHandler>();
+
+// Register decision handlers
+builder.Services.AddScoped<IGetDecisionsByPostIdHandler, GetDecisionsByPostIdHandler>();
+builder.Services.AddScoped<IGetDecisionByIdHandler, GetDecisionByIdHandler>();
+builder.Services.AddScoped<ICreateDecisionHandler, CreateDecisionHandler>();
+builder.Services.AddScoped<IUpdateDecisionHandler, UpdateDecisionHandler>();
+builder.Services.AddScoped<IDeleteDecisionHandler, DeleteDecisionHandler>();
 
 var app = builder.Build();
 
