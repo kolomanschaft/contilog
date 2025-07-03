@@ -18,6 +18,14 @@
     justify-content: center;
 }
 
+.info-tooltip-icon[data-color="primary"] {
+    background-color: var(--primary-color);
+}
+
+.info-tooltip-icon[data-color="decision"] {
+    background-color: var(--decision-text);
+}
+
 .info-tooltip-icon:hover {
     opacity: 1;
 }
@@ -39,6 +47,14 @@
     box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.2);
 }
 
+.info-tooltip-content[data-color="primary"] {
+    background-color: var(--primary-color);
+}
+
+.info-tooltip-content[data-color="decision"] {
+    background-color: var(--decision-text);
+}
+
 .info-tooltip-content::after {
     content: "";
     position: absolute;
@@ -46,7 +62,14 @@
     left: -5px;
     margin-top: -5px;
     border: 5px solid transparent;
-    border-right-color: inherit;
+}
+
+.info-tooltip-content[data-color="primary"]::after {
+    border-right-color: var(--primary-color);
+}
+
+.info-tooltip-content[data-color="decision"]::after {
+    border-right-color: var(--decision-text);
 }
 
 .info-tooltip:hover .info-tooltip-content {

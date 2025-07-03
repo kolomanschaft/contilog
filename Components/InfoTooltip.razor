@@ -1,8 +1,8 @@
 @namespace Contilog.Components
 
 <div class="info-tooltip">
-    <span class="oi oi-info info-tooltip-icon" aria-hidden="true" style="background-color: var(--@(Color)-text);"></span>
-    <div class="info-tooltip-content" style="background-color: var(--@(Color)-text);">
+    <span class="oi oi-info info-tooltip-icon" data-color="@Color" aria-hidden="true"></span>
+    <div class="info-tooltip-content" data-color="@Color">
         <div class="info-tooltip-inner">
             <div><strong>Author:</strong> @Author</div>
             @if (CreatedDate > DateTime.MinValue)

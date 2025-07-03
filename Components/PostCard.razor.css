@@ -2,7 +2,7 @@
 .post-card {
     background-color: var(--bg-white);
     border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
 }
 
 .post-header {
@@ -105,7 +105,6 @@
 
 /* Decisions section styling */
 .decisions-section {
-    border-top: 1px solid var(--border-color);
     padding-top: 1rem;
     margin-top: 1rem;
 }
@@ -122,7 +121,7 @@
     margin-left: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
 }
 
 .decisions-section .btn-sm {

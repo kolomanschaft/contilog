@@ -1,7 +1,7 @@
 .decision-card {
-    width: 90%;
-    margin-left: auto;
-    margin-right: auto;
+    width: calc(100% - 2rem);
+    margin-bottom: 2rem;
+    margin-left: 1rem;
     border-left: 4px solid var(--decision-border);
     background-color: var(--decision-bg);
     border: 1px solid var(--decision-border);

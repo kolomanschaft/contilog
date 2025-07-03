@@ -53,13 +53,10 @@
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-muted small">
-                        <div><strong>Author:</strong> @Post.Author</div>
-                        @if (Post.CreatedDate > DateTime.MinValue)
-                        {
-                            <div><strong>Created:</strong> @Post.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")</div>
-                        }
-                    </div>
+                    <Contilog.Components.InfoTooltip Author="@Post.Author" 
+                                                     CreatedDate="@Post.CreatedDate" 
+                                                     ModifiedDate="@Post.ModifiedDate" 
+                                                     Color="primary" />
                     <div class="btn-group">
                         <button type="submit" class="btn btn-success btn-sm">
                             <span class="oi oi-check" aria-hidden="true"></span>
@@ -86,6 +83,12 @@
             <div class="post-header d-flex justify-content-between align-items-start">
                 <div class="post-content">
                     <div class="post-text">@((MarkupString)Post.Content)</div>
+                    <div class="post-info mt-2">
+                        <Contilog.Components.InfoTooltip Author="@Post.Author" 
+                                                         CreatedDate="@Post.CreatedDate" 
+                                                         ModifiedDate="@Post.ModifiedDate" 
+                                                         Color="primary" />
+                    </div>
                 </div>
                 <div class="post-meta-top text-end text-muted">
                     @if (CanEdit)
@@ -103,36 +106,15 @@
                                           OnClick="AddNewDecision" />
                         </div>
                     }
-                    <div class="post-author">
-                        <strong>@Post.Author</strong>
-                    </div>
-                    @if (Post.CreatedDate > DateTime.MinValue)
-                    {
-                        <div class="post-date">
-                            <b>Created: </b>
-                            @Post.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
-                        </div>
-                    }
-                    @if (Post.ModifiedDate > DateTime.MinValue && !Post.ModifiedDate.Equals(Post.CreatedDate))
-                    {
-                        <div class="post-date">
-                            <b>Last modified: </b>
-                            @Post.ModifiedDate.ToString("MMM dd, yyyy 'at' h:mm tt")
-                        </div>
-                    }
                 </div>
             </div>
         }
     </div>
     
     <!-- Decisions Section -->
-    @if (!IsEditing && decisions.Any())
+    @if (!IsEditing && (decisions.Any() || isAddingNewDecision))
     {
         <div class="decisions-section mt-3">
-            <h6 class="decisions-title text-muted mb-2">
-                <span class="oi oi-task" aria-hidden="true"></span>
-                Decisions (@decisions.Count())
-            </h6>
             <div class="decisions-container">
                 @foreach (var decision in decisions.OrderBy(d => d.CreatedDate))
                 {
@@ -197,7 +179,8 @@
                 Content = Post.Content,
                 Author = Post.Author,
                 TopicId = Post.TopicId,
-                CreatedDate = Post.CreatedDate
+                CreatedDate = Post.CreatedDate,
+                ModifiedDate = Post.ModifiedDate
             };
         }
 
