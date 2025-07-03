@@ -3,6 +3,7 @@
     background-color: var(--bg-white);
     border: 1px solid var(--border-color);
     box-shadow: var(--shadow-md);
+    margin-bottom: 2rem !important;
 }
 
 .post-header {
@@ -105,8 +106,7 @@
 
 /* Decisions section styling */
 .decisions-section {
-    padding-top: 1rem;
-    margin-top: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .decisions-title {
