@@ -28,3 +28,39 @@
     max-width: var(--card-max-width);
     margin: 0 auto 2rem auto;
 }
+
+/* Custom toggle switch styling */
+.form-switch {
+    padding-left: 3.5em; /* Increased padding for larger switch */
+    display: flex;
+    align-items: center; /* Align items vertically */
+}
+
+.form-switch .form-check-input {
+    width: 3em; /* Larger width */
+    height: 1.5em; /* Larger height */
+    margin-left: -3.5em; /* Adjusted margin */
+    margin-top: 0; /* Remove default margin */
+    border-color: var(--border-color);
+    background-color: var(--bg-secondary);
+    vertical-align: middle;
+}
+
+.form-switch .form-check-input:focus {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 0 0.2rem rgba(27, 110, 194, 0.25); /* Using primary color with opacity */
+}
+
+.form-switch .form-check-input:checked {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.form-switch .form-check-label {
+    font-size: 1.1em; /* Larger label text */
+    font-weight: 500;
+    color: var(--text-primary);
+    line-height: 1.5em; /* Match the height of the toggle */
+    margin-bottom: 0; /* Remove default margin */
+    margin-left: 0.5rem; /* Add space between toggle and text */
+}

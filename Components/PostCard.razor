@@ -259,11 +259,12 @@
         StateHasChanged();
     }
 
-    private async Task HandleDecisionEditRequested(Decision decision)
+    private Task HandleDecisionEditRequested(Decision decision)
     {
         editingDecisionId = decision.Id;
         isAddingNewDecision = false;
         StateHasChanged();
+        return Task.CompletedTask;
     }
 
     private async Task HandleDecisionSaveRequested(Decision decision)
@@ -279,11 +280,12 @@
         StateHasChanged();
     }
 
-    private async Task HandleDecisionCancelRequested()
+    private Task HandleDecisionCancelRequested()
     {
         editingDecisionId = 0;
         isAddingNewDecision = false;
         StateHasChanged();
+        return Task.CompletedTask;
     }
 
     private async Task HandleDecisionDeleteRequested(Decision decision)
@@ -311,9 +313,10 @@
         StateHasChanged();
     }
 
-    private async Task HandleNewDecisionCancelRequested()
+    private Task HandleNewDecisionCancelRequested()
     {
         isAddingNewDecision = false;
         StateHasChanged();
+        return Task.CompletedTask;
     }
 }
