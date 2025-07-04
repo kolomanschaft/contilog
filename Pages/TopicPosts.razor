@@ -3,6 +3,7 @@
 @using Contilog.Handlers.Topics
 @using Contilog.Handlers.Categories
 @using Contilog.Handlers.Posts
+@using Contilog.Components
 @using System.Linq
 @inject IGetTopicByIdHandler GetTopicByIdHandler
 @inject IGetCategoryByIdHandler GetCategoryByIdHandler
@@ -23,21 +24,24 @@
 }
 else
 {
+    <div class="page-header">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>@topic.Title</h1>
+            <a href="/topics" class="btn btn-primary">
+                <span class="oi oi-arrow-left" aria-hidden="true"></span>
+                Back to Topics
+            </a>
+        </div>
+    </div>
+    
     <div class="topic-info mb-4">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">@topic.Title</h4>
-                <a href="/topics" class="btn btn-primary">
-                    <span class="oi oi-arrow-left" aria-hidden="true"></span>
-                    Back to Topics
-                </a>
-            </div>
             <div class="card-body">
                 <div class="row small">
                     <div class="col-md-4">
                         <strong>Category:</strong> @categoryName
                     </div>
-            </div>
+                </div>
                 <div class="row small mt-2">
                     <div class="col-md-4">
                         <strong>Status:</strong> 
@@ -49,8 +53,13 @@ else
     </div>
 
     <div class="posts-section">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-            <h3>Posts (@posts.Count())</h3>
+        <div class="section-header">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="d-flex align-items-center">
+                    <h3 class="mb-0 me-2">Posts</h3>
+                    <span class="badge bg-primary">@posts.Count()</span>
+                </div>
+            </div>
         </div>
 
         @if (!posts.Any() && !isAddingNewPost && topic.IsActive)

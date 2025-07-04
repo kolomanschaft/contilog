@@ -1,9 +1,4 @@
 /* Topics page styling */
-.topics-header {
-    max-width: var(--card-max-width);
-    margin: 0 auto 2rem auto;
-}
-
 /* Topic link styling */
 .topic-link {
     color: var(--text-link);

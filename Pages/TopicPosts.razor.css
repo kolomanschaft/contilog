@@ -10,15 +10,6 @@
     box-shadow: var(--shadow-sm);
 }
 
-.topic-info .card-header {
-    background-color: transparent;
-    border-bottom: none;
-}
-
-.topic-info .card-title {
-    color: var(--primary);
-}
-
 .topic-info .card-body .row {
     color: var(--primary);
 }
