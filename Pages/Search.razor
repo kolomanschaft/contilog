@@ -26,7 +26,7 @@
     <div class="search-input-section mb-4">
         <div class="input-group input-group-lg">
             <input type="text" class="form-control" placeholder="Search categories, topics, posts, and decisions..." 
-                   @bind="searchQuery" @onkeypress="HandleKeyPress" />
+                   @bind="searchQuery" @bind:event="oninput" @onkeydown="HandleKeyPress" />
             <button class="btn btn-primary" type="button" @onclick="PerformSearch">
                 <span class="oi oi-magnifying-glass" aria-hidden="true"></span>
                 Search
@@ -183,6 +183,7 @@
 
 @code {
     private string searchQuery = string.Empty;
+    private string lastSearchTerm = string.Empty;
     private bool isSearching = false;
     private bool hasSearched = false;
 
@@ -275,6 +276,7 @@
             return Task.CompletedTask;
 
         isSearching = true;
+        lastSearchTerm = searchQuery.Trim(); // Store the search term for highlighting
         StateHasChanged();
 
         try
@@ -325,10 +327,10 @@
 
     private string HighlightSearchTerm(string text)
     {
-        if (string.IsNullOrWhiteSpace(searchQuery) || string.IsNullOrWhiteSpace(text))
+        if (string.IsNullOrWhiteSpace(lastSearchTerm) || string.IsNullOrWhiteSpace(text))
             return text;
 
-        var query = Regex.Escape(searchQuery.Trim());
+        var query = Regex.Escape(lastSearchTerm);
         var highlighted = Regex.Replace(text, query, 
             match => $"<mark class=\"search-highlight\">{match.Value}</mark>", 
             RegexOptions.IgnoreCase);
