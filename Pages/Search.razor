@@ -1,0 +1,408 @@
+@page "/search"
+@using Contilog.Models
+@using Contilog.Handlers.Topics
+@using Contilog.Handlers.Categories
+@using Contilog.Handlers.Posts
+@using Contilog.Handlers.Decisions
+@using Contilog.Components
+@using System.Linq
+@using System.Text.RegularExpressions
+@using Microsoft.AspNetCore.Components.Web
+@inject IGetAllTopicsHandler GetAllTopicsHandler
+@inject IGetAllCategoriesHandler GetAllCategoriesHandler
+@inject IGetPostsByTopicIdHandler GetPostsByTopicIdHandler
+@inject IGetDecisionsByPostIdHandler GetDecisionsByPostIdHandler
+@inject NavigationManager Navigation
+
+<PageTitle>Search</PageTitle>
+
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Search</h1>
+    </div>
+</div>
+
+<div class="search-container">
+    <div class="search-input-section mb-4">
+        <div class="input-group input-group-lg">
+            <input type="text" class="form-control" placeholder="Search categories, topics, posts, and decisions..." 
+                   @bind="searchQuery" @onkeypress="HandleKeyPress" />
+            <button class="btn btn-primary" type="button" @onclick="PerformSearch">
+                <span class="oi oi-magnifying-glass" aria-hidden="true"></span>
+                Search
+            </button>
+        </div>
+    </div>
+
+    @if (isSearching)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Searching...</span>
+            </div>
+        </div>
+    }
+    else if (hasSearched)
+    {
+        <div class="search-results">
+            <div class="section-header">
+                <div class="d-flex align-items-center mb-3">
+                    <h3 class="mb-0 me-2">Results</h3>
+                    <span class="badge bg-primary">@totalResults</span>
+                </div>
+            </div>
+
+            @if (totalResults == 0)
+            {
+                <div class="alert alert-info">
+                    <h5>No results found</h5>
+                    <p>Try adjusting your search terms or browse categories directly.</p>
+                </div>
+            }
+            else
+            {
+                @if (categoryResults.Any())
+                {
+                    <div class="result-section mb-4">
+                        <h4 class="result-section-title">
+                            <span class="oi oi-folder me-2" aria-hidden="true"></span>
+                            Categories (@categoryResults.Count)
+                        </h4>
+                        <div class="results-list">
+                            @foreach (var category in categoryResults)
+                            {
+                                <div class="result-item category-result" @onclick="() => NavigateToTopics()">
+                                    <div class="result-content">
+                                        <h6 class="result-title">@((MarkupString)HighlightSearchTerm(category.Name))</h6>
+                                        <small class="text-muted">Category</small>
+                                    </div>
+                                    <div class="result-meta">
+                                        <span class="badge bg-secondary">@GetTopicCountForCategory(category.Id) topics</span>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if (topicResults.Any())
+                {
+                    <div class="result-section mb-4">
+                        <h4 class="result-section-title">
+                            <span class="oi oi-comment-square me-2" aria-hidden="true"></span>
+                            Topics (@topicResults.Count)
+                        </h4>
+                        <div class="results-list">
+                            @foreach (var topic in topicResults)
+                            {
+                                <div class="result-item topic-result" @onclick="() => NavigateToTopic(topic.Id)">
+                                    <div class="result-content">
+                                        <h6 class="result-title">@((MarkupString)HighlightSearchTerm(topic.Title))</h6>
+                                        <small class="text-muted">Topic in @GetCategoryName(topic.CategoryId)</small>
+                                    </div>
+                                    <div class="result-meta">
+                                        <span class="badge bg-secondary">@GetPostCountForTopic(topic.Id) posts</span>
+                                        @if (!topic.IsActive)
+                                        {
+                                            <span class="badge bg-warning ms-1">Archived</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if (postResults.Any())
+                {
+                    <div class="result-section mb-4">
+                        <h4 class="result-section-title">
+                            <span class="oi oi-document me-2" aria-hidden="true"></span>
+                            Posts (@postResults.Count)
+                        </h4>
+                        <div class="results-list">
+                            @foreach (var post in postResults)
+                            {
+                                <div class="result-item post-result" @onclick="() => NavigateToPost(post.TopicId, post.Id)">
+                                    <div class="result-content">
+                                        <h6 class="result-title">Post by @post.Author</h6>
+                                        <p class="result-excerpt">@((MarkupString)HighlightSearchTerm(GetExcerpt(post.Content)))</p>
+                                        <small class="text-muted">in @GetTopicTitle(post.TopicId)</small>
+                                    </div>
+                                    <div class="result-meta">
+                                        <small class="text-muted">@post.CreatedDate.ToString("MMM dd, yyyy")</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                @if (decisionResults.Any())
+                {
+                    <div class="result-section mb-4">
+                        <h4 class="result-section-title">
+                            <span class="oi oi-check me-2" aria-hidden="true"></span>
+                            Decisions (@decisionResults.Count)
+                        </h4>
+                        <div class="results-list">
+                            @foreach (var decision in decisionResults)
+                            {
+                                <div class="result-item decision-result" @onclick="() => NavigateToPostForDecision(decision.PostId)">
+                                    <div class="result-content">
+                                        <h6 class="result-title">Decision by @decision.Author</h6>
+                                        <p class="result-excerpt">@((MarkupString)HighlightSearchTerm(GetExcerpt(decision.Text)))</p>
+                                        <small class="text-muted">in @GetTopicTitleForPost(decision.PostId)</small>
+                                    </div>
+                                    <div class="result-meta">
+                                        <small class="text-muted">@decision.CreatedDate.ToString("MMM dd, yyyy")</small>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+    else
+    {
+        <div class="search-help">
+            <div class="alert alert-light">
+                <h5><span class="oi oi-info me-2" aria-hidden="true"></span>Search Tips</h5>
+                <ul class="mb-0">
+                    <li>Search across all categories, topics, posts, and decisions</li>
+                    <li>Use keywords to find relevant content</li>
+                    <li>Click on any result to navigate directly to that content</li>
+                    <li>Results show the most relevant matches first</li>
+                </ul>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private string searchQuery = string.Empty;
+    private bool isSearching = false;
+    private bool hasSearched = false;
+
+    private List<Category> allCategories = new();
+    private List<Topic> allTopics = new();
+    private List<Post> allPosts = new();
+    private List<Decision> allDecisions = new();
+
+    private List<Category> categoryResults = new();
+    private List<Topic> topicResults = new();
+    private List<Post> postResults = new();
+    private List<Decision> decisionResults = new();
+
+    private Dictionary<int, int> topicCounts = new();
+    private Dictionary<int, int> postCounts = new();
+
+    private int totalResults => categoryResults.Count + topicResults.Count + postResults.Count + decisionResults.Count;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAllData();
+    }
+
+    private async Task LoadAllData()
+    {
+        try
+        {
+            // Load categories
+            var categoriesResponse = await GetAllCategoriesHandler.Handle(new GetAllCategoriesRequest());
+            allCategories = categoriesResponse.Categories.ToList();
+
+            // Load topics
+            var topicsResponse = await GetAllTopicsHandler.Handle(new GetAllTopicsRequest());
+            allTopics = topicsResponse.Topics.ToList();
+
+            // Load all posts
+            allPosts.Clear();
+            allDecisions.Clear();
+            topicCounts.Clear();
+            postCounts.Clear();
+
+            foreach (var topic in allTopics)
+            {
+                var postsResponse = await GetPostsByTopicIdHandler.Handle(new GetPostsByTopicIdRequest(topic.Id));
+                var topicPosts = postsResponse.Posts.ToList();
+                allPosts.AddRange(topicPosts);
+                postCounts[topic.Id] = topicPosts.Count;
+
+                // Load decisions for each post
+                foreach (var post in topicPosts)
+                {
+                    try
+                    {
+                        var decisionsResponse = await GetDecisionsByPostIdHandler.Handle(new GetDecisionsByPostIdRequest(post.Id));
+                        if (decisionsResponse.Decisions?.Any() == true)
+                        {
+                            allDecisions.AddRange(decisionsResponse.Decisions);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error loading decisions for post {post.Id}: {ex.Message}");
+                    }
+                }
+            }
+
+            // Calculate topic counts per category
+            foreach (var category in allCategories)
+            {
+                topicCounts[category.Id] = allTopics.Count(t => t.CategoryId == category.Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading search data: {ex.Message}");
+        }
+    }
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            await PerformSearch();
+        }
+    }
+
+    private Task PerformSearch()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery))
+            return Task.CompletedTask;
+
+        isSearching = true;
+        StateHasChanged();
+
+        try
+        {
+            var query = searchQuery.Trim().ToLowerInvariant();
+
+            // Search categories
+            categoryResults = allCategories
+                .Where(c => c.Name.ToLowerInvariant().Contains(query))
+                .OrderBy(c => c.Name)
+                .ToList();
+
+            // Search topics
+            topicResults = allTopics
+                .Where(t => t.Title.ToLowerInvariant().Contains(query))
+                .OrderByDescending(t => t.IsActive)
+                .ThenBy(t => t.Title)
+                .ToList();
+
+            // Search posts
+            postResults = allPosts
+                .Where(p => p.Content.ToLowerInvariant().Contains(query) || 
+                           p.Author.ToLowerInvariant().Contains(query))
+                .OrderBy(p => p.CreatedDate)
+                .ToList();
+
+            // Search decisions
+            decisionResults = allDecisions
+                .Where(d => d.Text.ToLowerInvariant().Contains(query) || 
+                           d.Author.ToLowerInvariant().Contains(query))
+                .OrderBy(d => d.CreatedDate)
+                .ToList();
+
+            hasSearched = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error performing search: {ex.Message}");
+        }
+        finally
+        {
+            isSearching = false;
+            StateHasChanged();
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private string HighlightSearchTerm(string text)
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery) || string.IsNullOrWhiteSpace(text))
+            return text;
+
+        var query = Regex.Escape(searchQuery.Trim());
+        var highlighted = Regex.Replace(text, query, 
+            match => $"<mark class=\"search-highlight\">{match.Value}</mark>", 
+            RegexOptions.IgnoreCase);
+        
+        return highlighted;
+    }
+
+    private string GetExcerpt(string content, int maxLength = 150)
+    {
+        if (string.IsNullOrWhiteSpace(content))
+            return string.Empty;
+
+        if (content.Length <= maxLength)
+            return content;
+
+        var excerpt = content.Substring(0, maxLength);
+        var lastSpace = excerpt.LastIndexOf(' ');
+        if (lastSpace > 0)
+            excerpt = excerpt.Substring(0, lastSpace);
+
+        return excerpt + "...";
+    }
+
+    private string GetCategoryName(int categoryId)
+    {
+        return allCategories.FirstOrDefault(c => c.Id == categoryId)?.Name ?? "Unknown";
+    }
+
+    private string GetTopicTitle(int topicId)
+    {
+        return allTopics.FirstOrDefault(t => t.Id == topicId)?.Title ?? "Unknown";
+    }
+
+    private string GetTopicTitleForPost(int postId)
+    {
+        var post = allPosts.FirstOrDefault(p => p.Id == postId);
+        if (post != null)
+        {
+            return GetTopicTitle(post.TopicId);
+        }
+        return "Unknown";
+    }
+
+    private int GetTopicCountForCategory(int categoryId)
+    {
+        return topicCounts.TryGetValue(categoryId, out var count) ? count : 0;
+    }
+
+    private int GetPostCountForTopic(int topicId)
+    {
+        return postCounts.TryGetValue(topicId, out var count) ? count : 0;
+    }
+
+    private void NavigateToTopics()
+    {
+        Navigation.NavigateTo("/topics");
+    }
+
+    private void NavigateToTopic(int topicId)
+    {
+        Navigation.NavigateTo($"/topics/{topicId}");
+    }
+
+    private void NavigateToPost(int topicId, int postId)
+    {
+        Navigation.NavigateTo($"/topics/{topicId}#post-{postId}");
+    }
+
+    private void NavigateToPostForDecision(int postId)
+    {
+        var post = allPosts.FirstOrDefault(p => p.Id == postId);
+        if (post != null)
+        {
+            Navigation.NavigateTo($"/topics/{post.TopicId}#post-{postId}");
+        }
+    }
+}
