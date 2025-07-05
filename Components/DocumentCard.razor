@@ -1,0 +1,63 @@
+@using Contilog.Models
+@using Contilog.Components
+@using System.Text.Json
+
+<div class="card document-card">
+    <div class="card-body">
+        <div class="document-header">
+            <h5 class="card-title">@Data.Title</h5>
+            <div class="document-actions">
+                <ActionButton Icon="oi-trash" 
+                            Color="danger" 
+                            IsOutlined="true" 
+                            Title="Delete Document" 
+                            OnClick="OnDelete" />
+            </div>
+        </div>
+
+        <div class="document-meta mb-3">
+            <small class="text-muted d-block">
+                <span class="oi oi-calendar me-1"></span>
+                Document Date: @Data.Date.ToString("MMM dd, yyyy")
+            </small>
+            <small class="text-muted d-block">
+                <span class="oi oi-clock me-1"></span>
+                Created: @Document.CreatedDate.ToString("MMM dd, yyyy HH:mm")
+            </small>
+        </div>
+
+        @if (Data.Attendees.Any())
+        {
+            <div class="document-attendees mb-3">
+                <h6 class="mb-2">Attendees:</h6>
+                <div class="attendees-badges">
+                    @foreach (var attendee in Data.Attendees)
+                    {
+                        <span class="badge bg-light text-dark me-1 mb-1">@attendee</span>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="document-stats">
+            <span class="badge bg-info">
+                <span class="oi oi-document me-1"></span>
+                @Data.Posts.Count posts included
+            </span>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public Document Document { get; set; } = default!;
+    [Parameter, EditorRequired] public DocumentData Data { get; set; } = default!;
+    [Parameter] public EventCallback OnDelete { get; set; }
+
+    public class DocumentData
+    {
+        public string Title { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+        public List<string> Attendees { get; set; } = new();
+        public List<Post> Posts { get; set; } = new();
+    }
+}
