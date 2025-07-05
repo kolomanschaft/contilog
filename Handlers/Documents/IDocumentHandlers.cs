@@ -17,4 +17,8 @@ namespace Contilog.Handlers.Documents
     public interface IDeleteDocumentHandler : IHandler<DeleteDocumentRequest, DeleteDocumentResponse>
     {
     }
+
+    public interface IGenerateTxtDocumentHandler : IHandler<GenerateTxtDocumentRequest, GenerateTxtDocumentResponse>
+    {
+    }
 }

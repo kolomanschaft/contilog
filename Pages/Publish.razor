@@ -1,19 +1,21 @@
 @page "/publish"
 @using Contilog.Models
 @using Contilog.Repositories
-@using Contilog.Components
 @using Contilog.Handlers.Documents
 @using Contilog.Handlers.Posts
 @using Contilog.Handlers.Topics
 @using Contilog.Handlers.Categories
 @using System.Text.Json
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.JSInterop
 @inject IGetAllDocumentsHandler GetAllDocumentsHandler
 @inject ICreateDocumentHandler CreateDocumentHandler
 @inject IDeleteDocumentHandler DeleteDocumentHandler
 @inject IGetAllPostsHandler GetAllPostsHandler
 @inject IGetAllTopicsHandler GetAllTopicsHandler
 @inject IGetAllCategoriesHandler GetAllCategoriesHandler
+@inject IGenerateTxtDocumentHandler GenerateTxtDocumentHandler
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Publish</PageTitle>
 
@@ -114,10 +116,10 @@
             {
                 @foreach (var document in documents.OrderByDescending(d => d.CreatedDate))
                 {
-                    var jsonRepresentation = SerializeToJson(document);
                     <DocumentCard Document="document"
-                                  JsonRepresentation="@jsonRepresentation"
-                                  OnDelete="() => DeleteDocument(document.Id)" />
+                                  JsonRepresentation="@SerializeToJson(document)"
+                                  OnDelete="() => DeleteDocument(document.Id)"
+                                  OnDownload="() => DownloadDocument(document)" />
                 }
             }
         </div>
@@ -178,7 +180,7 @@
             newAttendee = string.Empty;
         }
 
-        return Task.CompletedTask;        
+        return Task.CompletedTask;
     }
 
     private void RemoveAttendee(string attendee)
@@ -237,5 +239,18 @@
         {
             WriteIndented = true
         });
+    }
+
+    private async Task DownloadDocument(Document document)
+    {
+        var response = await GenerateTxtDocumentHandler.Handle(new GenerateTxtDocumentRequest(document));
+        if (response.Success)
+        {
+            await JSRuntime.InvokeVoidAsync("downloadFile", response.FileName, response.Base64Data, response.MimeType);
+        }
+        else
+        {
+            Console.WriteLine("Failed to generate document for download");
+        }
     }
 }

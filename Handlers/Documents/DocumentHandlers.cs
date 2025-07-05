@@ -98,7 +98,7 @@ namespace Contilog.Handlers.Documents
                     CategoryName = category.Name
                 };
             });
-        }            
+        }
     }
 
     public class DeleteDocumentHandler : IDeleteDocumentHandler
@@ -114,6 +114,79 @@ namespace Contilog.Handlers.Documents
         {
             var success = await _documentRepository.DeleteAsync(request.Id);
             return new DeleteDocumentResponse(success);
+        }
+    }
+
+    public class GenerateTxtDocumentHandler : IGenerateTxtDocumentHandler
+    {
+        public Task<GenerateTxtDocumentResponse> Handle(GenerateTxtDocumentRequest request)
+        {
+            try
+            {
+                var textContent = GenerateTextContent(request.Document);
+                var bytes = System.Text.Encoding.UTF8.GetBytes(textContent);
+                var fileName = $"{request.Document.Title}_{request.Document.DocumentDate:yyyy-MM-dd}.txt";
+                var base64 = Convert.ToBase64String(bytes);
+                return Task.FromResult(new GenerateTxtDocumentResponse(fileName, base64, "text/plain", true));
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error generating document: {ex.GetType().Name}: {ex.Message}");
+                if (ex.InnerException != null)
+                {
+                    Console.WriteLine($"Inner exception: {ex.InnerException.GetType().Name}: {ex.InnerException.Message}");
+                }
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+            }
+
+            return Task.FromResult(new GenerateTxtDocumentResponse(string.Empty, string.Empty, string.Empty, false));
+        }
+
+        private string GenerateTextContent(Document document)
+        {
+            var content = new System.Text.StringBuilder();
+            
+            content.AppendLine($"Document: {document.Title}");
+            content.AppendLine($"Date: {document.DocumentDate:MMMM dd, yyyy}");
+            content.AppendLine($"Created: {document.CreatedDate:MMMM dd, yyyy HH:mm}");
+            content.AppendLine();
+            
+            if (document.Attendees.Any())
+            {
+                content.AppendLine("Attendees:");
+                foreach (var attendee in document.Attendees)
+                {
+                    content.AppendLine($"  • {attendee}");
+                }
+                content.AppendLine();
+            }
+            
+            content.AppendLine($"Posts ({document.Posts.Count} total)");
+            content.AppendLine(new string('=', 50));
+            
+            var postsByTopic = document.Posts.GroupBy(p => p.TopicTitle).OrderBy(g => g.Key);
+            
+            foreach (var topicGroup in postsByTopic)
+            {
+                content.AppendLine();
+                content.AppendLine($"Topic: {topicGroup.Key}");
+                content.AppendLine(new string('-', 30));
+                
+                foreach (var post in topicGroup.OrderBy(p => p.PostContent))
+                {
+                    content.AppendLine();
+                    content.AppendLine(StripHtmlTags(post.PostContent));
+                    content.AppendLine($"Category: {post.CategoryName} | Post ID: {post.PostId}");
+                    content.AppendLine();
+                }
+            }
+            
+            return content.ToString();
+        }
+
+        private string StripHtmlTags(string input)
+        {
+            return System.Text.RegularExpressions.Regex.Replace(input, "<.*?>", string.Empty);
         }
     }
 }

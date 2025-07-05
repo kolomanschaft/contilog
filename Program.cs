@@ -55,6 +55,7 @@ builder.Services.AddScoped<IGetAllDocumentsHandler, GetAllDocumentsHandler>();
 builder.Services.AddScoped<IGetDocumentByIdHandler, GetDocumentByIdHandler>();
 builder.Services.AddScoped<ICreateDocumentHandler, CreateDocumentHandler>();
 builder.Services.AddScoped<IDeleteDocumentHandler, DeleteDocumentHandler>();
+builder.Services.AddScoped<IGenerateTxtDocumentHandler, GenerateTxtDocumentHandler>();
 
 var app = builder.Build();
 

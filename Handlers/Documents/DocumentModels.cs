@@ -17,4 +17,8 @@ namespace Contilog.Handlers.Documents
     // Delete document
     public record DeleteDocumentRequest(int Id);
     public record DeleteDocumentResponse(bool Success);
+
+    // Generate TXT document
+    public record GenerateTxtDocumentRequest(Document Document);
+    public record GenerateTxtDocumentResponse(string FileName, string Base64Data, string MimeType, bool Success);
 }
