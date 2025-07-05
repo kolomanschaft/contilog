@@ -114,9 +114,9 @@
             {
                 @foreach (var document in documents.OrderByDescending(d => d.CreatedDate))
                 {
-                    var documentData = ParseDocumentJson(document.JsonContent);
-                    <DocumentCard Document="document" 
-                                  Data="documentData" 
+                    var jsonRepresentation = SerializeToJson(document);
+                    <DocumentCard Document="document"
+                                  JsonRepresentation="@jsonRepresentation"
                                   OnDelete="() => DeleteDocument(document.Id)" />
                 }
             }
@@ -193,54 +193,20 @@
         isCreating = true;
         try
         {
-            // Get all posts using handler
-            var allPostsResponse = await GetAllPostsHandler.Handle(new GetAllPostsRequest());
-            var allPosts = allPostsResponse.Posts.ToList();
-            
-            // Get unique topic IDs from posts
-            var topicIds = allPosts.Select(p => p.TopicId).Distinct().ToList();
-            
-            // Get all topics using handler
-            var allTopicsResponse = await GetAllTopicsHandler.Handle(new GetAllTopicsRequest());
-            var referencedTopics = allTopicsResponse.Topics.Where(t => topicIds.Contains(t.Id)).ToList();
-            
-            // Get unique category IDs from the referenced topics
-            var categoryIds = referencedTopics.Select(t => t.CategoryId).Distinct().ToList();
-            
-            // Get all categories using handler
-            var allCategoriesResponse = await GetAllCategoriesHandler.Handle(new GetAllCategoriesRequest());
-            var referencedCategories = allCategoriesResponse.Categories.Where(c => categoryIds.Contains(c.Id)).ToList();
-
-            // Create document data
-            var documentData = new DocumentCard.DocumentData
+            // create document
+            var documentResponse = await CreateDocumentHandler.Handle(new CreateDocumentRequest(documentForm.Title, documentForm.Date, documentForm.Attendees.ToList()));
+            if (documentResponse.Success)
             {
-                Title = documentForm.Title,
-                Date = documentForm.Date,
-                Attendees = documentForm.Attendees.ToList(),
-                Posts = allPosts,
-                Topics = referencedTopics,
-                Categories = referencedCategories
-            };
+                // Reset form
+                documentForm = new DocumentFormModel();
 
-            // Convert to JSON
-            var jsonContent = JsonSerializer.Serialize(documentData, new JsonSerializerOptions
+                // Add document to list
+                documents.Insert(0, documentResponse.Document);
+            }
+            else
             {
-                WriteIndented = true
-            });
-
-            // Create document
-            var document = new Document
-            {
-                JsonContent = jsonContent
-            };
-
-            await CreateDocumentHandler.Handle(new CreateDocumentRequest(document));
-
-            // Reset form
-            documentForm = new DocumentFormModel();
-            
-            // Reload documents
-            await LoadDocuments();
+                Console.WriteLine("Failed to create document");
+            }
         }
         catch (Exception ex)
         {
@@ -265,15 +231,11 @@
         }
     }
 
-    private DocumentCard.DocumentData ParseDocumentJson(string jsonContent)
+    private string SerializeToJson(Document document)
     {
-        try
+        return JsonSerializer.Serialize(document, new JsonSerializerOptions
         {
-            return JsonSerializer.Deserialize<DocumentCard.DocumentData>(jsonContent) ?? new DocumentCard.DocumentData();
-        }
-        catch (Exception)
-        {
-            return new DocumentCard.DocumentData { Title = "Invalid Document" };
-        }
+            WriteIndented = true
+        });
     }
 }

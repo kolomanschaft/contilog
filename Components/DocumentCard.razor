@@ -5,7 +5,7 @@
 <div class="card document-card">
     <div class="card-body">
         <div class="document-header">
-            <h5 class="card-title">@Data.Title</h5>
+            <h5 class="card-title">@Document.Title</h5>
             <div class="document-actions">
                 <ActionButton Icon="oi-trash" 
                             Color="danger" 
@@ -18,7 +18,7 @@
         <div class="document-meta mb-3">
             <small class="text-muted d-block">
                 <span class="oi oi-calendar me-1"></span>
-                Document Date: @Data.Date.ToString("MMM dd, yyyy")
+                Document Date: @Document.DocumentDate.ToString("MMM dd, yyyy")
             </small>
             <small class="text-muted d-block">
                 <span class="oi oi-clock me-1"></span>
@@ -26,12 +26,12 @@
             </small>
         </div>
 
-        @if (Data.Attendees.Any())
+        @if (Document.Attendees.Any())
         {
             <div class="document-attendees mb-3">
                 <h6 class="mb-2">Attendees:</h6>
                 <div class="attendees-badges">
-                    @foreach (var attendee in Data.Attendees)
+                    @foreach (var attendee in Document.Attendees)
                     {
                         <span class="badge bg-light text-dark me-1 mb-1">@attendee</span>
                     }
@@ -42,7 +42,7 @@
         <div class="document-stats">
             <span class="badge bg-info">
                 <span class="oi oi-document me-1"></span>
-                @Data.Posts.Count posts included
+                @Document.Posts.Count posts included
             </span>
         </div>
 
@@ -55,7 +55,7 @@
             @if (showJson)
             {
                 <div class="json-content mt-2">
-                    <pre class="json-payload">@Document.JsonContent</pre>
+                    <pre class="json-payload">@JsonRepresentation</pre>
                 </div>
             }
         </div>
@@ -64,7 +64,7 @@
 
 @code {
     [Parameter, EditorRequired] public Document Document { get; set; } = default!;
-    [Parameter, EditorRequired] public DocumentData Data { get; set; } = default!;
+    [Parameter] public string JsonRepresentation { get; set; } = default!;
     [Parameter] public EventCallback OnDelete { get; set; }
 
     private bool showJson = false;
@@ -72,15 +72,5 @@
     private void ToggleJsonVisibility()
     {
         showJson = !showJson;
-    }
-
-    public class DocumentData
-    {
-        public string Title { get; set; } = string.Empty;
-        public DateTime Date { get; set; }
-        public List<string> Attendees { get; set; } = new();
-        public List<Post> Posts { get; set; } = new();
-        public List<Topic> Topics { get; set; } = new();
-        public List<Category> Categories { get; set; } = new();
     }
 }

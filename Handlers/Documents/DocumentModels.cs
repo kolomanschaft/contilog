@@ -11,8 +11,8 @@ namespace Contilog.Handlers.Documents
     public record GetDocumentByIdResponse(Document? Document);
 
     // Create document
-    public record CreateDocumentRequest(Document Document);
-    public record CreateDocumentResponse(Document Document);
+    public record CreateDocumentRequest(string Title, DateTime documentDate, List<string> Attendees);
+    public record CreateDocumentResponse(Document Document, bool Success);
 
     // Delete document
     public record DeleteDocumentRequest(int Id);
