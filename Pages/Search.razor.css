@@ -104,15 +104,6 @@
     border-left: 4px solid var(--warning-color);
 }
 
-/* Search highlight styling */
-.search-highlight {
-    background-color: #fff3cd;
-    color: #856404;
-    padding: 0.1rem 0.2rem;
-    border-radius: 0.25rem;
-    font-weight: 600;
-}
-
 /* Search help styling */
 .search-help {
     margin-top: 2rem;

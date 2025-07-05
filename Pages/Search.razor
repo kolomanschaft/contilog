@@ -332,7 +332,7 @@
 
         var query = Regex.Escape(lastSearchTerm);
         var highlighted = Regex.Replace(text, query, 
-            match => $"<mark class=\"search-highlight\">{match.Value}</mark>", 
+            match => $"<mark style=\"background-color: #fff3cd; color: #856404; padding: 0\">{match.Value}</mark>", 
             RegexOptions.IgnoreCase);
         
         return highlighted;
