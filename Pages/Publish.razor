@@ -3,12 +3,17 @@
 @using Contilog.Repositories
 @using Contilog.Components
 @using Contilog.Handlers.Documents
+@using Contilog.Handlers.Posts
+@using Contilog.Handlers.Topics
+@using Contilog.Handlers.Categories
 @using System.Text.Json
 @using System.ComponentModel.DataAnnotations
 @inject IGetAllDocumentsHandler GetAllDocumentsHandler
 @inject ICreateDocumentHandler CreateDocumentHandler
 @inject IDeleteDocumentHandler DeleteDocumentHandler
-@inject IPostRepository PostRepository
+@inject IGetAllPostsHandler GetAllPostsHandler
+@inject IGetAllTopicsHandler GetAllTopicsHandler
+@inject IGetAllCategoriesHandler GetAllCategoriesHandler
 
 <PageTitle>Publish</PageTitle>
 
@@ -188,8 +193,23 @@
         isCreating = true;
         try
         {
-            // Get all posts
-            var allPosts = await PostRepository.GetAllPosts();
+            // Get all posts using handler
+            var allPostsResponse = await GetAllPostsHandler.Handle(new GetAllPostsRequest());
+            var allPosts = allPostsResponse.Posts.ToList();
+            
+            // Get unique topic IDs from posts
+            var topicIds = allPosts.Select(p => p.TopicId).Distinct().ToList();
+            
+            // Get all topics using handler
+            var allTopicsResponse = await GetAllTopicsHandler.Handle(new GetAllTopicsRequest());
+            var referencedTopics = allTopicsResponse.Topics.Where(t => topicIds.Contains(t.Id)).ToList();
+            
+            // Get unique category IDs from the referenced topics
+            var categoryIds = referencedTopics.Select(t => t.CategoryId).Distinct().ToList();
+            
+            // Get all categories using handler
+            var allCategoriesResponse = await GetAllCategoriesHandler.Handle(new GetAllCategoriesRequest());
+            var referencedCategories = allCategoriesResponse.Categories.Where(c => categoryIds.Contains(c.Id)).ToList();
 
             // Create document data
             var documentData = new DocumentCard.DocumentData
@@ -197,7 +217,9 @@
                 Title = documentForm.Title,
                 Date = documentForm.Date,
                 Attendees = documentForm.Attendees.ToList(),
-                Posts = allPosts.ToList()
+                Posts = allPosts,
+                Topics = referencedTopics,
+                Categories = referencedCategories
             };
 
             // Convert to JSON

@@ -2,6 +2,10 @@ using Contilog.Handlers;
 
 namespace Contilog.Handlers.Posts
 {
+    public interface IGetAllPostsHandler : IHandler<GetAllPostsRequest, GetAllPostsResponse>
+    {
+    }
+    
     public interface IGetPostsByTopicIdHandler : IHandler<GetPostsByTopicIdRequest, GetPostsByTopicIdResponse>
     {
     }

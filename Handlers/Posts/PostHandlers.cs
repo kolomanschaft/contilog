@@ -3,6 +3,22 @@ using Contilog.Repositories;
 
 namespace Contilog.Handlers.Posts
 {
+    public class GetAllPostsHandler : IGetAllPostsHandler
+    {
+        private readonly IPostRepository _postRepository;
+
+        public GetAllPostsHandler(IPostRepository postRepository)
+        {
+            _postRepository = postRepository;
+        }
+
+        public async Task<GetAllPostsResponse> Handle(GetAllPostsRequest request)
+        {
+            var posts = await _postRepository.GetAllPosts();
+            return new GetAllPostsResponse(posts);
+        }
+    }
+
     public class GetPostsByTopicIdHandler : IGetPostsByTopicIdHandler
     {
         private readonly IPostRepository _postRepository;

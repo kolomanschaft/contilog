@@ -35,6 +35,7 @@ builder.Services.AddScoped<IUpdateCategoryHandler, UpdateCategoryHandler>();
 builder.Services.AddScoped<IArchiveCategoryHandler, ArchiveCategoryHandler>();
 
 // Register post handlers
+builder.Services.AddScoped<IGetAllPostsHandler, GetAllPostsHandler>();
 builder.Services.AddScoped<IGetPostsByTopicIdHandler, GetPostsByTopicIdHandler>();
 builder.Services.AddScoped<IGetPostByIdHandler, GetPostByIdHandler>();
 builder.Services.AddScoped<IGetPostCountByTopicIdHandler, GetPostCountByTopicIdHandler>();

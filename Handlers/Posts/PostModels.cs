@@ -3,6 +3,8 @@ using Contilog.Models;
 namespace Contilog.Handlers.Posts
 {
     // Requests
+    public record GetAllPostsRequest();
+    
     public record GetPostsByTopicIdRequest(int TopicId);
     
     public record GetPostByIdRequest(int PostId);
@@ -16,6 +18,8 @@ namespace Contilog.Handlers.Posts
     public record DeletePostRequest(int PostId);
 
     // Responses
+    public record GetAllPostsResponse(IEnumerable<Post> Posts);
+    
     public record GetPostsByTopicIdResponse(IEnumerable<Post> Posts);
     
     public record GetPostByIdResponse(Post? Post);

@@ -60,10 +60,15 @@
     margin-top: auto;
     padding-top: 1rem;
     border-top: 1px solid var(--border-light);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
 }
 
 .document-stats .badge {
     font-size: 0.75rem;
+    display: inline-flex;
+    align-items: center;
 }
 
 /* JSON payload section */
