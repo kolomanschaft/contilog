@@ -45,6 +45,20 @@
                 @Data.Posts.Count posts included
             </span>
         </div>
+
+        <div class="document-json-section">
+            <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none" @onclick="ToggleJsonVisibility">
+                <span class="oi @(showJson ? "oi-chevron-bottom" : "oi-chevron-right") me-1"></span>
+                @(showJson ? "Hide" : "Show") JSON Payload
+            </button>
+            
+            @if (showJson)
+            {
+                <div class="json-content mt-2">
+                    <pre class="json-payload">@Document.JsonContent</pre>
+                </div>
+            }
+        </div>
     </div>
 </div>
 
@@ -52,6 +66,13 @@
     [Parameter, EditorRequired] public Document Document { get; set; } = default!;
     [Parameter, EditorRequired] public DocumentData Data { get; set; } = default!;
     [Parameter] public EventCallback OnDelete { get; set; }
+
+    private bool showJson = false;
+
+    private void ToggleJsonVisibility()
+    {
+        showJson = !showJson;
+    }
 
     public class DocumentData
     {
