@@ -40,6 +40,12 @@ namespace Contilog.Repositories
             };
         }
 
+        public async Task<IEnumerable<Post>> GetAllPosts()
+        {
+            var posts = _posts.OrderByDescending(p => p.CreatedDate).AsEnumerable();
+            return await Task.FromResult(posts);
+        }
+
         public async Task<IEnumerable<Post>> GetPostsByTopicId(int topicId)
         {
             var posts = _posts.Where(p => p.TopicId == topicId).OrderByDescending(p => p.CreatedDate).AsEnumerable();

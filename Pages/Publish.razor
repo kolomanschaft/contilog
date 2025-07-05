@@ -1,0 +1,305 @@
+@page "/publish"
+@using Contilog.Models
+@using Contilog.Repositories
+@using Contilog.Components
+@using System.Text.Json
+@using System.ComponentModel.DataAnnotations
+@inject IDocumentRepository DocumentRepository
+@inject IPostRepository PostRepository
+
+<PageTitle>Publish</PageTitle>
+
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Publish Documents</h1>
+    </div>
+</div>
+
+<div class="publish-container">
+    @if (isLoading)
+    {
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="documents-grid">
+            <!-- Create Document Card -->
+            <div class="card document-card create-document-card">
+                <div class="card-body">
+                    <div class="create-document-header">
+                        <h5 class="card-title">
+                            <span class="oi oi-plus me-2"></span>
+                            Create New Document
+                        </h5>
+                        <p class="card-text text-muted">Publish a snapshot of all current posts</p>
+                    </div>
+                    
+                    <EditForm Model="@documentForm" OnValidSubmit="CreateDocument">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger mb-3" />
+
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <InputText id="title" class="form-control" @bind-Value="documentForm.Title" placeholder="Enter document title" />
+                            <ValidationMessage For="@(() => documentForm.Title)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <InputDate id="date" class="form-control" @bind-Value="documentForm.Date" />
+                            <ValidationMessage For="@(() => documentForm.Date)" />
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="attendees" class="form-label">Attendees</label>
+                            <div class="input-group mb-2">
+                                <input type="text" class="form-control" placeholder="Enter attendee name" @bind="newAttendee" @onkeydown="HandleAttendeeKeyPress" />
+                                <button type="button" class="btn btn-outline-secondary" @onclick="AddAttendee">Add</button>
+                            </div>
+                            @if (documentForm.Attendees.Any())
+                            {
+                                <div class="attendees-list">
+                                    @foreach (var attendee in documentForm.Attendees)
+                                    {
+                                        <span class="badge bg-primary me-2 mb-2">
+                                            @attendee
+                                            <button type="button" class="btn-close btn-close-white ms-2" @onclick="() => RemoveAttendee(attendee)"></button>
+                                        </span>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary" disabled="@isCreating">
+                                @if (isCreating)
+                                {
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                    <span>Creating...</span>
+                                }
+                                else
+                                {
+                                    <span class="oi oi-document me-2"></span>
+                                    <span>Publish Document</span>
+                                }
+                            </button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+
+            <!-- Existing Documents -->
+            @if (!documents.Any())
+            {
+                <div class="card document-card empty-state-card">
+                    <div class="card-body text-center">
+                        <span class="oi oi-document display-4 text-muted mb-3"></span>
+                        <h5 class="card-title">No Documents Published</h5>
+                        <p class="card-text text-muted">Create your first document using the form on the left.</p>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @foreach (var document in documents.OrderByDescending(d => d.CreatedDate))
+                {
+                    var documentData = ParseDocumentJson(document.JsonContent);
+                    <div class="card document-card">
+                        <div class="card-body">
+                            <div class="document-header">
+                                <h5 class="card-title">@documentData.Title</h5>
+                                <div class="document-actions">
+                                <ActionButton Icon="oi-trash" 
+                                            Color="danger" 
+                                            IsOutlined="true" 
+                                            Title="Delete Document" 
+                                            OnClick="() => DeleteDocument(document.Id)" />
+                                </div>
+                            </div>
+
+                            <div class="document-meta mb-3">
+                                <small class="text-muted d-block">
+                                    <span class="oi oi-calendar me-1"></span>
+                                    Document Date: @documentData.Date.ToString("MMM dd, yyyy")
+                                </small>
+                                <small class="text-muted d-block">
+                                    <span class="oi oi-clock me-1"></span>
+                                    Created: @document.CreatedDate.ToString("MMM dd, yyyy HH:mm")
+                                </small>
+                            </div>
+
+                            @if (documentData.Attendees.Any())
+                            {
+                                <div class="document-attendees mb-3">
+                                    <h6 class="mb-2">Attendees:</h6>
+                                    <div class="attendees-badges">
+                                        @foreach (var attendee in documentData.Attendees)
+                                        {
+                                            <span class="badge bg-light text-dark me-1 mb-1">@attendee</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+
+                            <div class="document-stats">
+                                <span class="badge bg-info">
+                                    <span class="oi oi-document me-1"></span>
+                                    @documentData.Posts.Count posts included
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<Document> documents = new();
+    private DocumentFormModel documentForm = new();
+    private string newAttendee = string.Empty;
+    private bool isLoading = true;
+    private bool isCreating = false;
+
+    public class DocumentFormModel
+    {
+        [Required(ErrorMessage = "Title is required")]
+        [StringLength(200, ErrorMessage = "Title cannot exceed 200 characters")]
+        public string Title { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Date is required")]
+        public DateTime Date { get; set; } = DateTime.Today;
+
+        public List<string> Attendees { get; set; } = new();
+    }
+
+    public class DocumentData
+    {
+        public string Title { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+        public List<string> Attendees { get; set; } = new();
+        public List<Post> Posts { get; set; } = new();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDocuments();
+        isLoading = false;
+    }
+
+    private async Task LoadDocuments()
+    {
+        try
+        {
+            var result = await DocumentRepository.GetAllAsync();
+            documents = result.ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading documents: {ex.Message}");
+        }
+    }
+
+    private async Task HandleAttendeeKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && !string.IsNullOrWhiteSpace(newAttendee))
+        {
+            await AddAttendee();
+        }
+    }
+
+    private Task AddAttendee()
+    {
+        if (!string.IsNullOrWhiteSpace(newAttendee) && !documentForm.Attendees.Contains(newAttendee.Trim()))
+        {
+            documentForm.Attendees.Add(newAttendee.Trim());
+            newAttendee = string.Empty;
+        }
+
+        return Task.CompletedTask;        
+    }
+
+    private void RemoveAttendee(string attendee)
+    {
+        documentForm.Attendees.Remove(attendee);
+    }
+
+    private async Task CreateDocument()
+    {
+        if (isCreating) return;
+
+        isCreating = true;
+        try
+        {
+            // Get all posts
+            var allPosts = await PostRepository.GetAllPosts();
+
+            // Create document data
+            var documentData = new DocumentData
+            {
+                Title = documentForm.Title,
+                Date = documentForm.Date,
+                Attendees = documentForm.Attendees.ToList(),
+                Posts = allPosts.ToList()
+            };
+
+            // Convert to JSON
+            var jsonContent = JsonSerializer.Serialize(documentData, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            // Create document
+            var document = new Document
+            {
+                JsonContent = jsonContent
+            };
+
+            await DocumentRepository.CreateAsync(document);
+
+            // Reset form
+            documentForm = new DocumentFormModel();
+            
+            // Reload documents
+            await LoadDocuments();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating document: {ex.Message}");
+        }
+        finally
+        {
+            isCreating = false;
+        }
+    }
+
+    private async Task DeleteDocument(int documentId)
+    {
+        try
+        {
+            await DocumentRepository.DeleteAsync(documentId);
+            await LoadDocuments();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error deleting document: {ex.Message}");
+        }
+    }
+
+    private DocumentData ParseDocumentJson(string jsonContent)
+    {
+        try
+        {
+            return JsonSerializer.Deserialize<DocumentData>(jsonContent) ?? new DocumentData();
+        }
+        catch (Exception)
+        {
+            return new DocumentData { Title = "Invalid Document" };
+        }
+    }
+}

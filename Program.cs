@@ -17,6 +17,7 @@ builder.Services.AddSingleton<ICategoryRepository, CategoryRepository>();
 builder.Services.AddSingleton<ITopicRepository, TopicRepository>();
 builder.Services.AddSingleton<IPostRepository, PostRepository>();
 builder.Services.AddSingleton<IDecisionRepository, DecisionRepository>();
+builder.Services.AddSingleton<IDocumentRepository, DocumentRepository>();
 
 // Register topic handlers
 builder.Services.AddScoped<IGetAllTopicsHandler, GetAllTopicsHandler>();

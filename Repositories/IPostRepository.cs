@@ -4,6 +4,7 @@ namespace Contilog.Repositories
 {
     public interface IPostRepository
     {
+        Task<IEnumerable<Post>> GetAllPosts();
         Task<IEnumerable<Post>> GetPostsByTopicId(int topicId);
         Task<Post?> GetPostById(int id);
         Task<int> GetPostCountByTopicId(int topicId);
