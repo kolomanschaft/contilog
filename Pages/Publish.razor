@@ -2,9 +2,12 @@
 @using Contilog.Models
 @using Contilog.Repositories
 @using Contilog.Components
+@using Contilog.Handlers.Documents
 @using System.Text.Json
 @using System.ComponentModel.DataAnnotations
-@inject IDocumentRepository DocumentRepository
+@inject IGetAllDocumentsHandler GetAllDocumentsHandler
+@inject ICreateDocumentHandler CreateDocumentHandler
+@inject IDeleteDocumentHandler DeleteDocumentHandler
 @inject IPostRepository PostRepository
 
 <PageTitle>Publish</PageTitle>
@@ -145,8 +148,8 @@
     {
         try
         {
-            var result = await DocumentRepository.GetAllAsync();
-            documents = result.ToList();
+            var response = await GetAllDocumentsHandler.Handle(new GetAllDocumentsRequest());
+            documents = response.Documents.ToList();
         }
         catch (Exception ex)
         {
@@ -209,7 +212,7 @@
                 JsonContent = jsonContent
             };
 
-            await DocumentRepository.CreateAsync(document);
+            await CreateDocumentHandler.Handle(new CreateDocumentRequest(document));
 
             // Reset form
             documentForm = new DocumentFormModel();
@@ -231,7 +234,7 @@
     {
         try
         {
-            await DocumentRepository.DeleteAsync(documentId);
+            await DeleteDocumentHandler.Handle(new DeleteDocumentRequest(documentId));
             await LoadDocuments();
         }
         catch (Exception ex)

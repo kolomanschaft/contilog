@@ -5,6 +5,7 @@ using Contilog.Handlers.Topics;
 using Contilog.Handlers.Categories;
 using Contilog.Handlers.Posts;
 using Contilog.Handlers.Decisions;
+using Contilog.Handlers.Documents;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +48,12 @@ builder.Services.AddScoped<IGetDecisionByIdHandler, GetDecisionByIdHandler>();
 builder.Services.AddScoped<ICreateDecisionHandler, CreateDecisionHandler>();
 builder.Services.AddScoped<IUpdateDecisionHandler, UpdateDecisionHandler>();
 builder.Services.AddScoped<IDeleteDecisionHandler, DeleteDecisionHandler>();
+
+// Register document handlers
+builder.Services.AddScoped<IGetAllDocumentsHandler, GetAllDocumentsHandler>();
+builder.Services.AddScoped<IGetDocumentByIdHandler, GetDocumentByIdHandler>();
+builder.Services.AddScoped<ICreateDocumentHandler, CreateDocumentHandler>();
+builder.Services.AddScoped<IDeleteDocumentHandler, DeleteDocumentHandler>();
 
 var app = builder.Build();
 
