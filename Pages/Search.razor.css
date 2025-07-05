@@ -57,16 +57,9 @@
     border-radius: 0.5rem;
     padding: 1rem;
     cursor: pointer;
-    transition: all 0.2s ease-in-out;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-}
-
-.result-item:hover {
-    border-color: var(--primary-light);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-1px);
 }
 
 .result-content {
