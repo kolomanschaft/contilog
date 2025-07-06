@@ -21,4 +21,8 @@ namespace Contilog.Handlers.Documents
     // Generate TXT document
     public record GenerateTxtDocumentRequest(Document Document);
     public record GenerateTxtDocumentResponse(string FileName, string Base64Data, string MimeType, bool Success);
+    
+    // Generate PDF document
+    public record GeneratePdfDocumentRequest(Document Document);
+    public record GeneratePdfDocumentResponse(string FileName, string Base64Data, string MimeType, bool Success);
 }

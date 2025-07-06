@@ -21,4 +21,8 @@ namespace Contilog.Handlers.Documents
     public interface IGenerateTxtDocumentHandler : IHandler<GenerateTxtDocumentRequest, GenerateTxtDocumentResponse>
     {
     }
+    
+    public interface IGeneratePdfDocumentHandler : IHandler<GeneratePdfDocumentRequest, GeneratePdfDocumentResponse>
+    {
+    }
 }
