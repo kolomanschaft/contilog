@@ -53,10 +53,9 @@
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-center">
-                    <Contilog.Components.InfoTooltip Author="@Post.Author" 
-                                                     CreatedDate="@Post.CreatedDate" 
-                                                     ModifiedDate="@Post.ModifiedDate" 
-                                                     Color="primary" />
+                    <GithubBadge Label="Author" 
+                                 Message="@Post.Author" 
+                                 Color="primary" />
                     <div class="btn-group">
                         <button type="submit" class="btn btn-success btn-sm">
                             <span class="oi oi-check" aria-hidden="true"></span>
@@ -83,11 +82,13 @@
             <div class="post-header d-flex justify-content-between align-items-start">
                 <div class="post-content">
                     <div class="post-text">@((MarkupString)Post.Content)</div>
-                    <div class="post-info mt-2">
-                        <Contilog.Components.InfoTooltip Author="@Post.Author" 
-                                                         CreatedDate="@Post.CreatedDate" 
-                                                         ModifiedDate="@Post.ModifiedDate" 
-                                                         Color="primary" />
+                    <div class="post-info mt-2 d-flex gap-3">
+                        <GithubBadge Label="Author" 
+                                     Message="@Post.Author" 
+                                     Color="info" />
+                        <GithubBadge Label="Status" 
+                                     Message="@(Post.IsPublished ? "Published" : "New")" 
+                                     Color="@(Post.IsPublished ? "published" : "unpublished")" />
                     </div>
                 </div>
                 <div class="post-meta-top text-end text-muted">

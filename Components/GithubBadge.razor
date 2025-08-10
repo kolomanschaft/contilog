@@ -1,0 +1,12 @@
+@namespace Contilog.Components
+
+<div class="github-badge" data-color="@Color">
+    <span class="github-badge-label">@Label</span>
+    <span class="github-badge-message">@Message</span>
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = "Status";
+    [Parameter] public string Message { get; set; } = "Info";
+    [Parameter] public string Color { get; set; } = "primary";
+}

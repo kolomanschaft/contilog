@@ -1,0 +1,60 @@
+.github-badge {
+    position: relative;
+    display: inline-flex;
+    font-family: 'Verdana', 'DejaVu Sans', Geneva, sans-serif;
+    font-size: 11px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 3px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+    background: linear-gradient(to bottom, #fcfcfc 0%, #eeeeee 100%);
+    border: 1px solid #d5d5d5;
+}
+
+.github-badge-label {
+    padding: 0 6px;
+    background: linear-gradient(to bottom, #fcfcfc 0%, #eeeeee 100%);
+    border-right: 1px solid #d5d5d5;
+    color: #333;
+    font-weight: bold;
+    border-radius: 3px 0 0 3px;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+    height: 20px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.github-badge-message {
+    padding: 0 6px;
+    height: 20px;
+    line-height: 20px;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    border-radius: 0 3px 3px 0;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Color variations */
+.github-badge[data-color="info"] .github-badge-message {
+    background: linear-gradient(to bottom, #2196f3 0%, #1976d2 100%);
+    color: white;
+}
+
+.github-badge[data-color="published"] .github-badge-message {
+    background: linear-gradient(to bottom, #4caf50 0%, #388e3c 100%);
+    color: white;
+}
+
+.github-badge[data-color="unpublished"] .github-badge-message {
+    background: linear-gradient(to bottom, #ffc653 0%, rgb(193, 149, 2) 100%);
+    color: white;
+}
+
+/* Default fallback */
+.github-badge:not([data-color]) .github-badge-message,
+.github-badge[data-color=""] .github-badge-message {
+    background: linear-gradient(to bottom, #666 0%, #555 100%);
+    color: white;
+}

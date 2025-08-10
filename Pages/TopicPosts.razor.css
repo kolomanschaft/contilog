@@ -2,6 +2,7 @@
 .topic-info {
     max-width: var(--content-max-width);
     margin: 0 auto;
+    margin-bottom: 3rem !important;
 }
 
 .topic-info .card {

@@ -1,5 +1,6 @@
 @namespace Contilog.Components
 @using Contilog.Models
+@using Contilog.Components
 @using Microsoft.AspNetCore.Components.Forms
 
 <div class="card decision-card mb-2">
@@ -20,13 +21,6 @@
                 </div>
                 
                 <div class="d-flex justify-content-between align-items-center">
-                    <div class="text-muted small">
-                        <div><strong>Author:</strong> @Decision.Author</div>
-                        @if (Decision.CreatedDate > DateTime.MinValue)
-                        {
-                            <div><strong>Created:</strong> @Decision.CreatedDate.ToString("MMM dd, yyyy 'at' h:mm tt")</div>
-                        }
-                    </div>
                     <div class="btn-group">
                         <button type="submit" class="btn btn-success btn-sm">
                             <span class="oi oi-check" aria-hidden="true"></span>
@@ -53,10 +47,9 @@
             <div class="decision-header d-flex justify-content-between align-items-start">
                 <div class="decision-content">
                     <div class="decision-text">@Decision.Text</div>
-                    <InfoTooltip Author="@Decision.Author" 
-                                 CreatedDate="@Decision.CreatedDate" 
-                                 ModifiedDate="@Decision.ModifiedDate" 
-                                 Color="decision" />
+                    <GithubBadge Label="Author" 
+                                 Message="@Decision.Author" 
+                                 Color="info" />
                 </div>
                 <div class="decision-meta-top text-end text-muted">
                     @if (CanEdit)

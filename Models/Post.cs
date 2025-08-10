@@ -8,5 +8,6 @@ namespace Contilog.Models
         public string Author { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
         public DateTime ModifiedDate { get; set; }
+        public bool IsPublished { get; set; }
     }
 }

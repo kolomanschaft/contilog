@@ -53,15 +53,6 @@ else
     </div>
 
     <div class="posts-section">
-        <div class="section-header">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="d-flex align-items-center">
-                    <h3 class="mb-0 me-2">Posts</h3>
-                    <span class="badge bg-primary">@posts.Count()</span>
-                </div>
-            </div>
-        </div>
-
         @if (!posts.Any() && !isAddingNewPost && topic.IsActive)
         {
             <div class="alert alert-info">
